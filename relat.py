@@ -374,7 +374,6 @@ class Projeto:
 
     def incluir_projeto(self):
 
-
         print(self.entNomor.get())
         print(self.entNama.get())
         print(self.entAlamat.get())
