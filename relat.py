@@ -1,7 +1,7 @@
-import tkinter as tk
-from tkinter import ttk, messagebox, Frame, Label, Listbox, TOP, LEFT, BOTH, X, Y, W, RIGHT, \
-    YES, SUNKEN, BOTTOM, VERTICAL, Toplevel, RAISED, HORIZONTAL
 import sqlite3
+import tkinter as tk
+from tkinter import ttk, messagebox, Frame, Label, Text, TOP, LEFT, BOTH, X, Y, W, RIGHT, \
+    YES, SUNKEN, BOTTOM, VERTICAL, Toplevel, RAISED, HORIZONTAL
 
 LARGE_FONT = ("Verdana", 12)
 NORM_FONT = ("Verdana", 10)
@@ -60,10 +60,10 @@ def centro_(win):
 
 
 class Relat:
-
     def __init__(self, parent, db):
         self.parent = parent
- 
+        self.db = db
+
         self.parent.title("Relat")
         self.parent.geometry("700x450")
         self.parent.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -71,7 +71,7 @@ class Relat:
         main_frame = Frame(self.parent)
         main_frame.pack(fill=BOTH, expand=YES)
 
-        #TOOLBAR
+        # TOOLBAR
         toolbar = Frame(main_frame)
         toolbar.pack(side=TOP, fill=X)
 
@@ -82,13 +82,12 @@ class Relat:
 
         ttk.Separator(toolbar).pack(side=LEFT, padx=1, pady=1)
 
-        self.encerrar_img = tk.PhotoImage(file="./imagens/btn.png")
+        self.encerrar_img = tk.PhotoImage(file="./imagens/sair.png")
 
         encerrar_btn = ttk.Button(toolbar, image=self.encerrar_img, command=self.on_close)
         encerrar_btn.pack(side=LEFT, padx=2, pady=2)
 
-        status_bar = Label(main_frame, text="www.KlinikPython.Wordpress.Com",
-                           relief=SUNKEN, bd=1)
+        status_bar = Label(main_frame, text="www.KlinikPython.Wordpress.Com", relief=SUNKEN, bd=1)
         status_bar.pack(side=BOTTOM, fill=X)
 
         frame_central = ttk.Notebook(main_frame)
@@ -108,8 +107,8 @@ class Relat:
         self.relatorios_grid.heading("desc", text="Descrição")
         self.relatorios_grid.heading("ult_execucao", text="Última Execução")
 
-        #for i in range(10):
-        #    self.relatorios_grid.insert("", "end", text="Item %s" % i)
+        for i in range(10):
+            self.relatorios_grid.insert("", "end", text="Item %s" % i)
 
         self.relatorios_grid.bind("<Double-1>", self.alterar_relatorio_click)
 
@@ -122,7 +121,7 @@ class Relat:
         frame_botoes = Frame(main_frame, width=200, padx=20, pady=30)
         frame_botoes.pack(side=RIGHT, fill=Y)
 
-        self.iniciar_img = tk.PhotoImage(file="./imagens/btn.png")
+        self.iniciar_img = tk.PhotoImage(file="./imagens/iniciar.png")
 
         self.iniciar_btn = ttk.Button(frame_botoes, text="Iniciar", width=20, image=self.iniciar_img, compound=LEFT,
                                       command=self.iniciar)
@@ -130,7 +129,7 @@ class Relat:
         # self.iniciar_btn.state(['!disabled'])
         self.iniciar_btn.pack(side=TOP, pady=2)
 
-        self.cancelar_img = tk.PhotoImage(file="./imagens/btn.png")
+        self.cancelar_img = tk.PhotoImage(file="./imagens/cancelar.png")
 
         self.cancelar_btn = ttk.Button(frame_botoes, text="Cancelar", width=20, image=self.cancelar_img, compound=LEFT,
                                        command=self.cancelar)
@@ -138,19 +137,20 @@ class Relat:
 
         ttk.Separator(frame_botoes).pack(side=TOP, padx=10, pady=1)
 
-        self.novo_relatorio_img = tk.PhotoImage(file="./imagens/btn.png")
+        self.novo_relatorio_img = tk.PhotoImage(file="./imagens/incluir.png")
 
-        self.novo_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Incluir", image=self.cancelar_img,
+        self.novo_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Incluir", image=self.novo_relatorio_img,
                                              compound=LEFT, command=self.novo_relatorio)
         self.novo_relatorio_btn.pack(side=TOP, pady=2)
 
-        self.alterar_relatorio_img = tk.PhotoImage(file="./imagens/btn.png")
+        self.alterar_relatorio_img = tk.PhotoImage(file="./imagens/alterar.png")
 
-        self.alterar_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Alterar", image=self.alterar_relatorio_img,
-                                              compound=LEFT, command=self.alterar_relatorio)
+        self.alterar_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Alterar",
+                                                image=self.alterar_relatorio_img,
+                                                compound=LEFT, command=self.alterar_relatorio)
         self.alterar_relatorio_btn.pack(side=TOP, pady=2)
 
-        self.excluir_relatorio_img = tk.PhotoImage(file="./imagens/btn.png")
+        self.excluir_relatorio_img = tk.PhotoImage(file="./imagens/excluir.png")
 
         self.excluir_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Excluir",
                                                 image=self.excluir_relatorio_img, compound=LEFT,
@@ -159,17 +159,43 @@ class Relat:
 
         ttk.Separator(frame_botoes).pack(side=TOP, padx=10, pady=1)
 
-        self.move_up_img = tk.PhotoImage(file="./imagens/btn.png")
+        self.move_up_img = tk.PhotoImage(file="./imagens/up.png")
 
         self.move_up_btn = ttk.Button(frame_botoes, width=20, text="Mover para cima", image=self.move_up_img,
                                       compound=LEFT, command=self.move_up)
         self.move_up_btn.pack(side=TOP, pady=2)
 
-        self.move_down_img = tk.PhotoImage(file="./imagens/btn.png")
+        self.move_down_img = tk.PhotoImage(file="./imagens/down.png")
 
         self.move_down_btn = ttk.Button(frame_botoes, width=20, text="Mover para baixo", image=self.move_down_img,
                                         compound=LEFT, command=self.move_down)
         self.move_down_btn.pack(side=TOP, pady=2)
+
+        menu_bar = tk.Menu(main_frame)
+
+        projeto_menu = tk.Menu(menu_bar, tearoff=0)
+        projeto_menu.add_command(label="Projetos", command=self.listaDeProjetos)
+
+        projeto_menu.add_command(label="Fechar Projeto", command=self.fechar_projeto)
+        projeto_menu.add_separator()
+        projeto_menu.add_command(label="Sair", command=self.on_close)
+        menu_bar.add_cascade(label="Projetos", menu=projeto_menu)
+
+        '''
+        edit_menu = tk.Menu(menu_bar, tearoff=0)
+        edit_menu.add_command(label="Configuração", command=lambda: msg("Not supported just yet!"))
+        menu_bar.add_cascade(label="Edit", menu=edit_menu)
+        '''
+
+        ajuda_menu = tk.Menu(menu_bar, tearoff=0)
+        ajuda_menu.add_command(label="Ajuda", command=self.sobre)
+
+        ajuda_menu.add_command(label="Licença", command=self.sobre)
+        ajuda_menu.add_separator()
+        ajuda_menu.add_command(label="Sobre", command=self.sobre)
+        menu_bar.add_cascade(label="Sobre", menu=ajuda_menu)
+
+        self.parent.config(menu=menu_bar)
 
     def on_close(self, event=None):
         self.parent.destroy()
@@ -187,10 +213,14 @@ class Relat:
 
     def listaDeProjetos(self):
         app = Projeto(self.parent, self.db)
-        #app.novo_projeto()
+        # app.novo_projeto()
+
+    def fechar_projeto(self):
+        app = Projeto(self.parent, self.db)
+        # app.novo_projeto()
 
     def abrir_projeto(self):
-        app = Projeto(self.parent)
+        app = Projeto(self.parent, self.db)
         app.abrir_projeto()
 
     def iniciar(self):
@@ -224,9 +254,7 @@ class Relat:
 
 
 class Projeto:
-    
     def __init__(self, master, db):
-
         self.master = master
         self.db = db
 
@@ -244,7 +272,7 @@ class Projeto:
         projeto_frame = Frame(self.projeto_janela, relief=RAISED, borderwidth=1)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.projeto_janela, text="Cancelar", width=10, command=self.on_close)
+        cancelar_btn = ttk.Button(self.projeto_janela, text="Fechar", width=10, command=self.on_close)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
         abrir_btn = ttk.Button(self.projeto_janela, text="Abrir", width=10, command=self.abrir_projeto)
@@ -256,15 +284,17 @@ class Projeto:
         grid_frame = Frame(projeto_frame, bd=10)
         grid_frame.pack(fill=BOTH, expand=YES, side=LEFT)
 
-        scroll = ttk.Scrollbar(grid_frame, orient=VERTICAL)
+        scroll_x = ttk.Scrollbar(grid_frame, orient=HORIZONTAL)
+        scroll_y = ttk.Scrollbar(grid_frame, orient=VERTICAL)
 
-        self.projetos_grid = ttk.Treeview(grid_frame, yscrollcommand=scroll.set)
-        self.projetos_grid.pack(fill=Y, side=LEFT)
+        self.projetos_grid = ttk.Treeview(grid_frame, yscrollcommand=scroll_y.set)
+
+        self.projetos_grid.pack(fill=BOTH, side=LEFT)
 
         self.projetos_grid.bind("<Double-1>", self.abrir_projeto_click)
 
-        scroll.configure(command=self.projetos_grid.yview)
-        scroll.pack(side=LEFT, fill=Y)
+        scroll_y.configure(command=self.projetos_grid.yview)
+        scroll_y.pack(side=LEFT, fill=Y)
 
         self.projetos_grid["columns"] = ("description", "last_update")
         self.projetos_grid.column("description", width=100)
@@ -273,13 +303,40 @@ class Projeto:
         self.projetos_grid.heading("last_update", text="Última Atualização")
 
         self.projetos_grid.insert("", 0, text="Line 1", values=("1A", "1b"))
+        self.projetos_grid.insert("", 1, text="Line 2", values=("2A", "2b"))
+        self.projetos_grid.insert("", 2, text="Line 3", values=("3A", "3b"))
 
-        id2 = self.projetos_grid.insert("", 3, "dir2", text="Dir 2")
-        self.projetos_grid.insert(id2, "end", "dir 2", text="sub dir 2", values=("2A", "2B"))
+        info_frame = Frame(projeto_frame, bd=10)
+        info_frame.pack(fill=BOTH, expand=YES, side=RIGHT)
 
-        ##alternatively:
-        self.projetos_grid.insert("", 4, "dir3", text="Dir 3")
-        self.projetos_grid.insert("dir3", 4, text=" sub dir 3", values=("3A", " 3B"))
+        group_info = ttk.LabelFrame(info_frame, text="Informações", padding=(6, 6, 12, 12))
+        group_info.grid(row=0, column=0, sticky='nsew')
+
+        ttk.Label(group_info, text='Nome', width=10).grid(row=0, column=0, sticky=W)
+        self.nome = ttk.Entry(group_info, width=25)
+        self.nome.grid(row=0, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_info, text='Descrição', width=10).grid(row=1, column=0, sticky=W)
+        self.descricao = Text(group_info, height=4, width=19)
+        self.descricao.grid(row=1, column=1, sticky=W, pady=2)
+
+        group_db = ttk.LabelFrame(info_frame, text="Acesso ao banco", padding=(6, 6, 12, 12))
+        group_db.grid(row=1, column=0, sticky='nsew')
+
+        ttk.Label(group_db, text='Tipo', width=10).grid(row=0, column=0, sticky=W)
+        self.box_value = tk.StringVar()
+        self.box = ttk.Combobox(group_db, textvariable=self.box_value, width=22)
+        self.box['values'] = ('', 'Oracle', 'Mysql', 'PostgreSql')
+        self.box.current(0)
+        self.box.grid(row=0, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_db, text='Usuário', width=10).grid(row=1, column=0, sticky=W)
+        self.usuario = ttk.Entry(group_db, width=25)
+        self.usuario.grid(row=1, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_db, text='Senha', width=10).grid(row=3, column=0, sticky=W)
+        self.senha = ttk.Entry(group_db, show="*", width=25)
+        self.senha.grid(row=3, column=1, sticky=W, pady=2)
 
         centro_(self.projeto_janela)
 
@@ -287,8 +344,8 @@ class Projeto:
         self.master.wait_window(self.projeto_janela)
 
     def novo_projeto(self):
-
         self.projeto_janela = Toplevel()
+        self.projeto_janela.resizable(0, 0)
 
         self.projeto_janela.title("Novo Projeto")
         self.projeto_janela.geometry("700x300")
@@ -302,48 +359,41 @@ class Projeto:
         projeto_frame = Frame(self.projeto_janela, relief=RAISED, borderwidth=1)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.projeto_janela, text="Fechar", width=10, command=self.on_close)
+        cancelar_btn = ttk.Button(self.projeto_janela, text="Cancelar", width=10, command=self.on_close)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.projeto_janela, text="Incluir", width=10, command=self.salvar)
+        ok_btn = ttk.Button(self.projeto_janela, text="Abrir", width=10, command=self.salvar)
         ok_btn.pack(side=RIGHT)
 
-        fr_kanan = Frame(self.projeto_janela, bd=10)
-        fr_kanan.pack(fill=BOTH, expand=YES, side=RIGHT)
+        # frame_kiri
+        grid_frame = Frame(projeto_frame, bd=10)
+        grid_frame.pack(fill=BOTH, expand=YES, side=LEFT)
 
-        # fr_kanan_atas
-        fr_katas = Frame(fr_kanan)
-        fr_katas.pack(side=TOP, expand=YES)
+        scroll = ttk.Scrollbar(grid_frame, orient=VERTICAL)
 
-        # data Nomor
-        ttk.Label(fr_katas, text='Nomor Urut').grid(
-            row=0, column=0, sticky=W)
-        self.entNomor = ttk.Entry(fr_katas)
-        self.entNomor.grid(row=0, column=1)
+        self.projetos_grid = ttk.Treeview(grid_frame, yscrollcommand=scroll.set)
 
-        # data Nama
-        ttk.Label(fr_katas, text='Nama Lengkap').grid(
-            row=1, column=0, sticky=W)
-        self.entNama = ttk.Entry(fr_katas)
-        self.entNama.grid(row=1, column=1)
+        self.projetos_grid.pack(fill=Y, side=LEFT)
 
-        # data Alamat
-        ttk.Label(fr_katas, text='Alamat').grid(
-            row=2, column=0, sticky=W)
-        self.entAlamat = ttk.Entry(fr_katas)
-        self.entAlamat.grid(row=2, column=1)
+        scroll.configure(command=self.projetos_grid.yview)
+        scroll.pack(side=LEFT, fill=Y)
 
-        # data NoTelp
-        ttk.Label(fr_katas, text='No. Telp').grid(
-            row=3, column=0, sticky=W)
-        self.entTelp = ttk.Entry(fr_katas)
-        self.entTelp.grid(row=3, column=1)
+        self.projetos_grid["columns"] = ("description", "last_update")
+        self.projetos_grid.column("description", width=100)
+        self.projetos_grid.column("last_update", width=100)
+        self.projetos_grid.heading("description", text="Descrição")
+        self.projetos_grid.heading("last_update", text="Última Atualização")
 
-        # data Kelas
-        ttk.Label(fr_katas, text='Kelas').grid(
-            row=4, column=0, sticky=W)
-        self.entKelas = ttk.Entry(fr_katas)
-        self.entKelas.grid(row=4, column=1)
+        self.projetos_grid.insert("", 0, text="Line 1", values=("1A", "1b"))
+        self.projetos_grid.insert("", 1, text="Line 2", values=("2A", "2b"))
+        self.projetos_grid.insert("", 2, text="Line 3", values=("3A", "3b"))
+
+        id2 = self.projetos_grid.insert("", 3, "dir2", text="Dir 2")
+        self.projetos_grid.insert(id2, "end", "dir 2", text="sub dir 2", values=("2A", "2B"))
+
+        ##alternatively:
+        self.projetos_grid.insert("", 4, "dir3", text="Dir 3")
+        self.projetos_grid.insert("dir3", 4, text=" sub dir 3", values=("3A", " 3B"))
 
         centro_(self.projeto_janela)
 
@@ -351,36 +401,30 @@ class Projeto:
         self.master.wait_window(self.projeto_janela)
 
     def abrir_projeto(self):
-
-        principal = Relat(self, self.db)
-
-        principal.relatorios_grid.insert("", 0, text="nome 1", values=("1A", "1b"))
-
-        principal.relatorios_grid.insert("", 0, text="Line 2", values=("2A", "2B"))
-
-        principal.relatorios_grid.insert("", 0, text="Line 3", values=("3A", "3B"))
-
-        self.projeto_janela.destroy()
+        app = Relatorio(self.parent)
+        app.alterar_relatorio()
 
     def abrir_projeto_click(self, event):
         item = self.projetos_grid.selection()[0]
 
-        print("you clicked on", self.projetos_grid.item(item, "text"))
+        app = Relatorio(self.parent)
+        app.alterar_relatorio()
 
-
-
-    def on_close(self):
-        self.projeto_janela.destroy()
+        print("you clicked on", self.relatorios_grid.item(item, "text"))
 
     def incluir_projeto(self):
-
         print(self.entNomor.get())
         print(self.entNama.get())
         print(self.entAlamat.get())
         print(self.entTelp.get())
         print(self.entKelas.get())
 
+    def on_close(self):
         self.projeto_janela.destroy()
+
+    def salvar(self):
+        self.projeto_janela.destroy()
+
 
 class Relatorio:
     def __init__(self, master, db):
@@ -389,6 +433,7 @@ class Relatorio:
 
     def novo_relatorio(self):
         self.relatorio_janela = Toplevel()
+        self.relatorio_janela.resizable(0, 0)
 
         self.relatorio_janela.title("Novo Relatório")
         self.relatorio_janela.geometry("500x300")
@@ -461,6 +506,7 @@ class Relatorio:
 
     def alterar_relatorio(self):
         self.relatorio_janela = Toplevel()
+        self.relatorio_janela.resizable(0, 0)
 
         self.relatorio_janela.title("Alterar Relatório")
         self.relatorio_janela.geometry("500x300")
@@ -509,6 +555,7 @@ class Sobre:
         self.master = master
 
         self.sobre_janela = Toplevel()
+        self.sobre_janela.resizable(0, 0)
 
         self.sobre_janela.title("Sobre")
         self.sobre_janela.geometry("400x300")
@@ -539,7 +586,6 @@ class Sobre:
 
 
 class DbInterno(object):
-
     ''' A classe DbInterno representa o banco de dados. '''
 
     def __init__(self, db_name):
@@ -560,74 +606,53 @@ class DbInterno(object):
             fd.close()
 
             # all SQL commands (split on ';')
-            sqlCommands = sql_file.split(';')
+            #sqlCommands = sql_file.split(';')
 
             print("Criando tabelas ...")
 
             # Execute every command from the input file
-            for command in sqlCommands:
-                # This will skip and report errors
-                # For example, if the tables do not yet exist, this will skip over
-                # the DROP TABLE commands
-                try:
-                    self.cursor.executescript(command)
-                except sqlite3.Error:
-                    print("Aviso: As tabelas já existem.")
-                    #return False
+            # for command in sqlCommands:
+            # This will skip and report errors
+            # For example, if the tables do not yet exist, this will skip over
+            # the DROP TABLE commands
+            try:
+                self.cursor.executescript(sql_file)
+            except sqlite3.Error:
+                print("Aviso: As tabelas já existem.")
+                # return False
 
             print("Tabelas criadas com sucesso.")
 
         except sqlite3.Error as er:
             print("Erro ao abrir banco. ", er.message)
-            #return False
+        # return False
 
-    def commit_db(self):
-        if self.conn:
-            self.conn.commit()
 
-    def close_db(self):
-        if self.conn:
-            self.conn.close()
-            print("Conexão fechada.")
+def commit_db(self):
+    if self.conn:
+        self.conn.commit()
+
+
+def close_db(self):
+    if self.conn:
+        self.conn.close()
+        print("Conexão fechada.")
 
 
 class ProjetosDb(object):
-    ''' A classe RelatDb representa um cliente no banco de dados. '''
+    ''' A classe ProjetosDb representa um projeto no banco de dados. '''
 
     def __init__(self):
-        #print("Criando tabela 'Projetos'")
+        pass
 
+    def inserir_um_registro(self):
         try:
             self.db.cursor.execute("""
-
-            );
-        """)
-        except sqlite3.Error:
-            print("Aviso: A tabela 'Projetos' já existe.")
-            return False
-
-        print("Tabela 'Projetos' criada com sucesso.")
-
-        print("Criando tabela 'Relatorios'.")
-
-        try:
-            self.db.cursor.execute("""
-
-        """)
-        except sqlite3.Error:
-            print("Aviso: A tabela 'Relatorios' já existe.")
-            return False
-
-        print("Tabela 'Relatorios' criada com sucesso.")
-
-
-    def novoProjeto(self):
-
-        try:
-            self.db.cursor.execute("""
-            INSERT INTO clientes (nome, idade, cpf, email, fone, cidade, uf, criado_em)
-            VALUES ('Regis da Silva', 35, '12345678901', 'regis@email.com', '(11) 9876-5342',
-            'São Paulo', 'SP', '2014-07-30 11:23:00.199000')
+            INSERT INTO projetos (nome, desc, autor, banco, conexao, usuario_db,
+    pass_db VARCHAR(100),
+    criado_em DATE NOT NULL,
+    alterado_em)
+            VALUES ('Regis da Silva', 35, '12345678901', 'regis@email.com', '(11) 9876-5342', 'Sao Paulo', 'SP', '2014-07-30 11:23:00.199000')
             """)
             # gravando no bd
             self.db.commit_db()
@@ -635,6 +660,11 @@ class ProjetosDb(object):
         except sqlite3.IntegrityError:
             print("Aviso: O email deve ser único.")
             return False
+
+    def listar_projetos(self):
+        sql = 'SELECT * FROM projetos ORDER BY nome'
+        r = self.db.cursor.execute(sql)
+        return r.fetchall()
 
     def localizar_projeto(self, id):
         r = self.db.cursor.execute(
@@ -688,18 +718,19 @@ class ProjetosDb(object):
             conn.commit()
             '''
 
+
 if __name__ == '__main__':
     root = tk.Tk()
+    root.resizable(0, 0)
     root.attributes('-alpha', 0.0)
 
     db = DbInterno('./data/relat.db')
 
     app = Relat(root, db)
-    
+
     centro(root)
-    
+
     root.attributes('-alpha', 1.0)
     root.mainloop()
 
     db.close_db()
-
