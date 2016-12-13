@@ -1,6 +1,6 @@
 import sqlite3
 import tkinter as tk
-from tkinter import ttk, messagebox, Frame, Label, Text, TOP, LEFT, BOTH, X, Y, W, RIGHT, END, \
+from tkinter import ttk, messagebox, Frame, Label, Text, TOP, LEFT, BOTH, X, Y, W, EW, NSEW, RIGHT, END, \
     YES, SUNKEN, BOTTOM, VERTICAL, Toplevel, RAISED, HORIZONTAL
 
 LARGE_FONT = ("Verdana", 12)
@@ -245,6 +245,7 @@ class Relat:
 
 
 class Projeto:
+
     def __init__(self, master, db):
         self.master = master
         self.db = db
@@ -252,7 +253,7 @@ class Projeto:
         self.projeto_janela = Toplevel()
 
         self.projeto_janela.title("Projetos")
-        self.projeto_janela.geometry("400x300")
+        self.projeto_janela.geometry("400x400")
         self.projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_projeto)
 
         self.projeto_janela.withdraw()
@@ -260,17 +261,19 @@ class Projeto:
         self.projeto_janela.transient(self.master)
         self.projeto_janela.grab_set()
 
-        projeto_frame = Frame(self.projeto_janela, relief=RAISED, borderwidth=1)
+        projeto_frame = Frame(self.projeto_janela)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.projeto_janela, text="Fechar", width=10, command=self.fechar_projeto)
-        cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
+        fechar_btn = ttk.Button(self.projeto_janela, text="Fechar", width=10, command=self.fechar_projeto)
+        fechar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        excluir_btn = ttk.Button(self.projeto_janela, text="Excluir", width=10, command=self.excluir_projeto)
-        excluir_btn.pack(side=RIGHT, padx=5, pady=5)
+        self.excluir_btn = ttk.Button(self.projeto_janela, text="Excluir", width=10, command=self.excluir_projeto)
+        self.excluir_btn.pack(side=RIGHT, padx=5, pady=5)
+        self.excluir_btn.state(["disabled"])
 
-        abrir_btn = ttk.Button(self.projeto_janela, text="Abrir", width=10, command=self.abrir_projeto)
-        abrir_btn.pack(side=RIGHT)
+        self.abrir_btn = ttk.Button(self.projeto_janela, text="Abrir", width=10, command=self.abrir_projeto)
+        self.abrir_btn.pack(side=RIGHT)
+        self.abrir_btn.state(["disabled"])
 
         novo_btn = ttk.Button(self.projeto_janela, text="Novo", width=10, command=self.novo_projeto)
         novo_btn.pack(side=RIGHT, padx=5, pady=5)
@@ -278,29 +281,30 @@ class Projeto:
         grid_frame = Frame(projeto_frame, bd=10)
         grid_frame.pack(fill=BOTH, expand=YES, side=LEFT)
 
+        self.dataCols = ('nome', 'ultima_atualizacao')
+        self.projetos_grid = ttk.Treeview(grid_frame, columns=self.dataCols)
+        self.projetos_grid.bind("<Double-1>", self.abrir_projeto_click)
+        self.projetos_grid.bind("<Button-1>", self.habilita_btn)
 
+        scroll_y = ttk.Scrollbar(orient=VERTICAL, command=self.projetos_grid.yview)
+        #xsb = ttk.Scrollbar(orient=HORIZONTAL, command=self.projetos_grid.xview)
+        #self.projetos_grid['yscroll'] = ysb.set
+        #self.projetos_grid['xscroll'] = xsb.set
 
-
-        # create the tree and scrollbars
-        self.dataCols = ('fullpath', 'type', 'size')
-        self.tree = ttk.Treeview(grid_frame, columns=self.dataCols,
-                                 displaycolumns='size')
-
-        ysb = ttk.Scrollbar(grid_frame, orient=VERTICAL, command=self.tree.yview)
-        xsb = ttk.Scrollbar(grid_frame, orient=HORIZONTAL, command=self.tree.xview)
-        self.tree['yscroll'] = ysb.set
-        self.tree['xscroll'] = xsb.set
+        scroll_y.configure(command=self.projetos_grid.yview)
+        scroll_y.pack(side=LEFT, fill=Y)
 
         # setup column headings
-        self.tree.heading('#0', text='Nome', anchor=W)
-        self.tree.heading('size', text='Última Atualização', anchor=W)
-        self.tree.column('size', stretch=0, width=70)
+        self.projetos_grid['show'] = 'headings'
+        self.projetos_grid.heading('nome', text='Nome', anchor=W)
+        self.projetos_grid.heading('ultima_atualizacao', text='Última Atualização', anchor=W)
+        self.projetos_grid.column('ultima_atualizacao', stretch=0, width=70)
 
-        self.tree.pack(fill=BOTH, side=LEFT)
+        self.projetos_grid.pack(fill=BOTH, side=LEFT, expand=True)
 
         dados = ProjetosDb(self.db).listar_projetos()
         for row in dados:
-            self.tree.insert("", 0, values=(row[1], row[9]))
+            self.projetos_grid.insert('', END, row[0], values=(row[1], row[9]))
 
         '''
         scroll_x = ttk.Scrollbar(grid_frame, orient=HORIZONTAL)
@@ -327,30 +331,18 @@ class Projeto:
         self.projetos_grid.insert("", 2, text="Line 3", values=("3A", "3b"))
         '''
 
-        btn_frame = Frame(projeto_frame, bd=10)
-        btn_frame.pack(fill=BOTH, expand=YES, side=RIGHT)
-
-        self.abrir_img = tk.PhotoImage(file="./imagens/abrir_projeto.png")
-
-        self.abrir_btn = ttk.Button(btn_frame, width=10, image=self.abrir_img, command=self.alterar_projeto)
-        abrir_btn.pack(side=RIGHT)
-
-        self.excluir_img = tk.PhotoImage(file="./imagens/excluir.png")
-
-        excluir_btn = ttk.Button(btn_frame, text="Novo", width=10, command=self.excluir_projeto)
-        novo_btn.pack(side=RIGHT, padx=5, pady=5)
-
         centro_(self.projeto_janela)
 
         self.projeto_janela.deiconify()
         self.master.wait_window(self.projeto_janela)
 
     def novo_projeto(self):
+
         self.novo_janela = Toplevel()
         self.novo_janela.resizable(0, 0)
 
         self.novo_janela.title("Novo Projeto")
-        self.novo_janela.geometry("700x300")
+        #self.novo_janela.geometry("700x400")
         self.novo_janela.protocol("WM_DELETE_WINDOW", self.fechar_novo)
 
         self.novo_janela.withdraw()
@@ -358,7 +350,7 @@ class Projeto:
         self.novo_janela.transient(self.master)
         self.novo_janela.grab_set()
 
-        projeto_frame = Frame(self.novo_janela, relief=RAISED, borderwidth=1)
+        projeto_frame = Frame(self.novo_janela)
         projeto_frame.pack(fill=BOTH, expand=True)
 
         cancelar_btn = ttk.Button(self.novo_janela, text="Cancelar", width=10, command=self.fechar_novo)
@@ -381,8 +373,12 @@ class Projeto:
         self.descricao = Text(group_info, height=4, width=19)
         self.descricao.grid(row=1, column=1, sticky=W, pady=2)
 
+        ttk.Label(group_info, text='Autor', width=10).grid(row=2, column=0, sticky=W)
+        self.autor = ttk.Entry(group_info, width=25)
+        self.autor.grid(row=2, column=1, sticky=W, pady=2)
+
         group_db = ttk.LabelFrame(info_frame, text="Acesso ao banco", padding=(6, 6, 12, 12))
-        group_db.grid(row=1, column=0, sticky='nsew')
+        group_db.grid(row=1, column=0, sticky=NSEW)
 
         ttk.Label(group_db, text='Tipo', width=10).grid(row=0, column=0, sticky=W)
         self.box_value = tk.StringVar()
@@ -391,13 +387,25 @@ class Projeto:
         self.box.current(0)
         self.box.grid(row=0, column=1, sticky=W, pady=2)
 
-        ttk.Label(group_db, text='Usuário', width=10).grid(row=1, column=0, sticky=W)
-        self.usuario = ttk.Entry(group_db, width=25)
-        self.usuario.grid(row=1, column=1, sticky=W, pady=2)
+        ttk.Label(group_db, text='Servidor', width=10).grid(row=1, column=0, sticky=W)
+        self.servidor = ttk.Entry(group_db, width=25)
+        self.servidor.grid(row=1, column=1, sticky=W, pady=2)
 
-        ttk.Label(group_db, text='Senha', width=10).grid(row=3, column=0, sticky=W)
-        self.senha = ttk.Entry(group_db, show="*", width=25)
+        ttk.Label(group_db, text='Porta', width=10).grid(row=2, column=0, sticky=W)
+        self.porta = ttk.Entry(group_db, width=15)
+        self.porta.grid(row=2, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_db, text='Banco', width=10).grid(row=3, column=0, sticky=W)
+        self.senha = ttk.Entry(group_db, width=25)
         self.senha.grid(row=3, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_db, text='Usuário', width=10).grid(row=4, column=0, sticky=W)
+        self.usuario = ttk.Entry(group_db, width=25)
+        self.usuario.grid(row=4, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_db, text='Senha', width=10).grid(row=5, column=0, sticky=W)
+        self.senha = ttk.Entry(group_db, show="*", width=25)
+        self.senha.grid(row=5, column=1, sticky=W, pady=2)
 
         centro_(self.novo_janela)
 
@@ -409,7 +417,7 @@ class Projeto:
         self.alterar_janela.resizable(0, 0)
 
         self.alterar_janela.title("Novo Projeto")
-        self.alterar_janela.geometry("700x300")
+        self.alterar_janela.geometry("700x500")
         self.alterar_janela.protocol("WM_DELETE_WINDOW", self.fechar)
 
         self.alterar_janela.withdraw()
@@ -440,7 +448,7 @@ class Projeto:
         self.descricao = Text(group_info, height=4, width=19)
         self.descricao.grid(row=1, column=1, sticky=W, pady=2)
 
-        ttk.Label(group_info, text='Descrição', width=10).grid(row=2, column=0, sticky=W)
+        ttk.Label(group_info, text='Autor', width=10).grid(row=2, column=0, sticky=W)
         self.autor = Text(group_info, height=4, width=19)
         self.autor.grid(row=2, column=1, sticky=W, pady=2)
 
@@ -454,13 +462,25 @@ class Projeto:
         self.box.current(0)
         self.box.grid(row=0, column=1, sticky=W, pady=2)
 
-        ttk.Label(group_db, text='Usuário', width=10).grid(row=1, column=0, sticky=W)
-        self.usuario = ttk.Entry(group_db, width=25)
-        self.usuario.grid(row=1, column=1, sticky=W, pady=2)
+        ttk.Label(group_db, text='Servidor', width=10).grid(row=1, column=0, sticky=W)
+        self.servidor = ttk.Entry(group_db, width=25)
+        self.servidor.grid(row=2, column=0, sticky=W, pady=2)
 
-        ttk.Label(group_db, text='Senha', width=10).grid(row=3, column=0, sticky=W)
-        self.senha = ttk.Entry(group_db, show="*", width=25)
+        ttk.Label(group_db, text='Porta', width=10).grid(row=1, column=0, sticky=W)
+        self.porta = ttk.Entry(group_db, width=25)
+        self.usuario.grid(row=2, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_db, text='Banco', width=10).grid(row=3, column=0, sticky=W)
+        self.senha = ttk.Entry(group_db, width=25)
         self.senha.grid(row=3, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_db, text='Usuário', width=10).grid(row=4, column=0, sticky=W)
+        self.usuario = ttk.Entry(group_db, width=25)
+        self.usuario.grid(row=4, column=1, sticky=W, pady=2)
+
+        ttk.Label(group_db, text='Senha', width=10).grid(row=5, column=0, sticky=W)
+        self.usuario = ttk.Entry(group_db, show="*", width=25)
+        self.usuario.grid(row=5, column=1, sticky=W, pady=2)
 
         centro_(self.alterar_janela)
 
@@ -477,14 +497,26 @@ class Projeto:
         app = Relatorio(self.parent)
         app.alterar_relatorio()
 
-        print("you clicked on", self.relatorios_grid.item(item, "text"))
+        print("you clicked on", self.projetos_grid.item(item, "text"))
+
+    def habilita_btn(self, event):
+        self.excluir_btn.state(["!disabled"])
+        self.abrir_btn.state(["!disabled"])
 
     def incluir_projeto(self):
-        print(self.entNomor.get())
-        print(self.entNama.get())
-        print(self.entAlamat.get())
-        print(self.entTelp.get())
-        print(self.entKelas.get())
+
+        arr = []
+        arr.append(self.nome.get())
+        arr.append(self.descricao.get())
+        arr.append(self.autor.get())
+        arr.append(self.bancos.get())
+        arr.append(self.nome.get())
+        arr.append(self.usuario.get())
+        arr.append(self.senha.get())
+
+        retorno = ProjetosDb(self.db).incluir_projeto(arr)
+        if retorno.isnumeric:
+            self.projetos_grid.insert('', END, arr[0], values=(row[1], row[9]))
 
     def alterar_projeto(self):
         print(self.entNomor.get())
@@ -507,7 +539,12 @@ class Projeto:
 
     def excluir_projeto(self):
         if deleteBox("Excluir", "Deseja realmente excluir o projeto selecionado?"):
-            print("Projeto excluído")
+            item = self.projetos_grid.selection()[0]
+            self.projetos_grid.delete(item)
+
+            ProjetosDb(self.db).excluirProjeto(item)
+
+            print("Projeto excluído: ", item)
 
 
 class Relatorio:
@@ -720,15 +757,12 @@ class ProjetosDb(object):
     def __init__(self, db):
         self.db = db
 
-    def inserir_um_registro(self, nome):
+    def incluir_projeto(self, dados):
         try:
             self.db.cursor.execute("""
-            INSERT INTO projetos (nome, desc, autor, banco, conexao, usuario_db,
-    pass_db VARCHAR(100),
-    criado_em DATE NOT NULL,
-    alterado_em)
-            VALUES ('Regis da Silva', 35, '12345678901', 'regis@email.com', '(11) 9876-5342', 'Sao Paulo', 'SP', '2014-07-30 11:23:00.199000')
-            """)
+            INSERT INTO projetos (nome, desc, autor, banco, conexao, usuario_db, pass_db, criado_em, alterado_em)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (dados[0], dados[1], dados[2], dados[3], dados[4], dados[5], dados[6], dados[7], dados[8],))
             # gravando no bd
             self.db.commit_db()
             print("Um registro inserido com sucesso.")
@@ -768,15 +802,15 @@ class ProjetosDb(object):
 
     def excluirProjeto(self, id):
         try:
-            c = self.localizar_cliente(id)
+            projeto = self.localizar_projeto(id)
             # verificando se existe cliente com o ID passado, caso exista
-            if c:
+            if projeto:
                 self.db.cursor.execute("""
                 DELETE FROM projetos WHERE id = ?
                 """, (id,))
                 # gravando no bd
                 self.db.commit_db()
-                print("Registro %d excluído com sucesso." % id)
+                print("Registro excluído com sucesso.")
             else:
                 print('Não existe projeto com o código informado.')
         except e:
