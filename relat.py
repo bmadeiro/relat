@@ -66,6 +66,7 @@ def centro_(win):
 
 
 class Relat:
+
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
@@ -89,22 +90,60 @@ class Relat:
         self.iniciar_img = tk.PhotoImage(file="./imagens/iniciar.png")
 
         self.iniciar_btn = ttk.Button(toolbar, image=self.iniciar_img, command=self.iniciar)
-        # self.iniciar_btn.state(['disabled'])  # set the disabled flag, disabling the button
+        self.iniciar_btn.state(['disabled'])  # set the disabled flag, disabling the button
         self.iniciar_btn.pack(side=LEFT, pady=1)
 
         self.cancelar_img = tk.PhotoImage(file="./imagens/stop.png")
 
         self.cancelar_btn = ttk.Button(toolbar, image=self.cancelar_img, command=self.cancelar)
-        #self.cancelar_btn.state(['disabled'])  # set the disabled flag, disabling the button
+        self.cancelar_btn.state(['disabled'])  # set the disabled flag, disabling the button
         # self.cancelar_btn.state(['!disabled'])
 
         self.cancelar_btn.pack(side=LEFT, pady=1)
 
-        status_bar = Label(main_frame, text="www.KlinikPython.Wordpress.Com", relief=SUNKEN, bd=1)
+        self.sair_img = tk.PhotoImage(file="./imagens/sair.png")
+
+        self.sair_btn = ttk.Button(toolbar, image=self.sair_img, command=self.on_close)
+        self.sair_btn.pack(side=LEFT, pady=1)
+
+        status_bar = Frame(main_frame)
         status_bar.pack(side=BOTTOM, fill=X)
+
+        self.text_status_bar = Label(status_bar, text="www.KlinikPython.Wordpress.Com", relief=SUNKEN, bd=1)
+        self.text_status_bar.pack(side=LEFT, fill=X, expand=True)
+
+        self.id_status_bar = Label(status_bar, text="")
+        self.id_status_bar.pack(side=RIGHT)
 
         frame_central = ttk.Notebook(main_frame)
 
+        grid_frame = Frame(frame_central, bd=10)
+        grid_frame.pack(fill=BOTH, expand=YES, side=LEFT)
+
+        self.dataCols = ('nome', 'ultima_atualizacao')
+        self.relatorios_grid = ttk.Treeview(grid_frame, selectmode='browse', columns=self.dataCols)
+        self.relatorios_grid.bind("<Double-1>", self.alterar_relatorio_click)
+        #self.relatorios_grid.bind("<Button-1>", self.habilita_btn)
+
+        scroll_y = ttk.Scrollbar(grid_frame, orient=VERTICAL, command=self.relatorios_grid.yview)
+        scroll_x = ttk.Scrollbar(grid_frame, orient=HORIZONTAL, command=self.relatorios_grid.xview)
+        self.relatorios_grid['yscroll'] = scroll_y.set
+        self.relatorios_grid['xscroll'] = scroll_x.set
+
+        scroll_y.configure(command=self.relatorios_grid.yview)
+        scroll_y.pack(side=RIGHT, fill=Y)
+        scroll_x.configure(command=self.relatorios_grid.xview)
+        scroll_x.pack(side=BOTTOM, fill=X)
+
+        # setup column headings
+        self.relatorios_grid['show'] = 'headings'
+        self.relatorios_grid.heading('nome', text='Nome', anchor=W)
+        self.relatorios_grid.column('nome', stretch=0, width=200)
+        self.relatorios_grid.heading('ultima_atualizacao', text='Última Atualização', anchor=W)
+        # self.projetos_grid.column('ultima_atualizacao', stretch=0, width=100)
+
+        self.relatorios_grid.pack(fill=BOTH, side=LEFT, expand=True)
+        '''
         grid_frame = Frame(frame_central)
 
         scroll = ttk.Scrollbar(grid_frame, orient=VERTICAL)
@@ -119,9 +158,10 @@ class Relat:
         self.relatorios_grid.column("ult_execucao", width=80)
         self.relatorios_grid.heading("desc", text="Descrição")
         self.relatorios_grid.heading("ult_execucao", text="Última Execução")
+        '''
 
-        for i in range(10):
-            self.relatorios_grid.insert("", "end", text="Item %s" % i)
+        #for i in range(10):
+        #    self.relatorios_grid.insert("", "end", text="Item %s" % i)
 
         self.relatorios_grid.bind("<Double-1>", self.alterar_relatorio_click)
 
@@ -282,23 +322,26 @@ class Projeto:
         grid_frame.pack(fill=BOTH, expand=YES, side=LEFT)
 
         self.dataCols = ('nome', 'ultima_atualizacao')
-        self.projetos_grid = ttk.Treeview(grid_frame, columns=self.dataCols)
-        self.projetos_grid.bind("<Double-1>", self.abrir_projeto_click)
+        self.projetos_grid = ttk.Treeview(grid_frame, selectmode='browse', columns=self.dataCols)
+        self.projetos_grid.bind("<Double-1>", self.abrir_projeto)
         self.projetos_grid.bind("<Button-1>", self.habilita_btn)
 
-        scroll_y = ttk.Scrollbar(orient=VERTICAL, command=self.projetos_grid.yview)
-        #xsb = ttk.Scrollbar(orient=HORIZONTAL, command=self.projetos_grid.xview)
-        #self.projetos_grid['yscroll'] = ysb.set
-        #self.projetos_grid['xscroll'] = xsb.set
+        scroll_y = ttk.Scrollbar(grid_frame, orient=VERTICAL, command=self.projetos_grid.yview)
+        scroll_x = ttk.Scrollbar(grid_frame, orient=HORIZONTAL, command=self.projetos_grid.xview)
+        self.projetos_grid['yscroll'] = scroll_y.set
+        self.projetos_grid['xscroll'] = scroll_x.set
 
         scroll_y.configure(command=self.projetos_grid.yview)
-        scroll_y.pack(side=LEFT, fill=Y)
+        scroll_y.pack(side=RIGHT, fill=Y)
+        scroll_x.configure(command=self.projetos_grid.xview)
+        scroll_x.pack(side=BOTTOM, fill=X)
 
         # setup column headings
         self.projetos_grid['show'] = 'headings'
         self.projetos_grid.heading('nome', text='Nome', anchor=W)
+        self.projetos_grid.column('nome', stretch=0, width=200)
         self.projetos_grid.heading('ultima_atualizacao', text='Última Atualização', anchor=W)
-        self.projetos_grid.column('ultima_atualizacao', stretch=0, width=70)
+        #self.projetos_grid.column('ultima_atualizacao', stretch=0, width=100)
 
         self.projetos_grid.pack(fill=BOTH, side=LEFT, expand=True)
 
@@ -336,7 +379,7 @@ class Projeto:
         self.projeto_janela.deiconify()
         self.master.wait_window(self.projeto_janela)
 
-    def novo_projeto(self):
+    def novo_projeto_janela(self):
 
         self.novo_janela = Toplevel()
         self.novo_janela.resizable(0, 0)
@@ -487,23 +530,22 @@ class Projeto:
         self.alterar_janela.deiconify()
         self.master.wait_window(self.projeto_janela)
 
-    def abrir_projeto(self):
-        app = RelatoriosDb.listar_relatorios(self.db)
+    def abrir_projeto(self, event):
+
+        projeto_id = self.projetos_grid.selection()[0]
+
+        relatorios_lista = RelatoriosDb(self.db).listar_relatorios(projeto_id)
+        print(relatorios_lista)
+        for row in relatorios_lista:
+            self.relatorios_grid.insert('', END, row[0], values=(row[1], row[8]))
+
         self.fechar_projeto()
-
-    def abrir_projeto_click(self, event):
-        item = self.projetos_grid.selection()[0]
-
-        app = Relatorio(self.parent)
-        app.alterar_relatorio()
-
-        print("you clicked on", self.projetos_grid.item(item, "text"))
 
     def habilita_btn(self, event):
         self.excluir_btn.state(["!disabled"])
         self.abrir_btn.state(["!disabled"])
 
-    def incluir_projeto(self):
+    def novo_projeto(self):
 
         arr = []
         arr.append(self.nome.get())
@@ -517,6 +559,8 @@ class Projeto:
         retorno = ProjetosDb(self.db).incluir_projeto(arr)
         if retorno.isnumeric:
             self.projetos_grid.insert('', END, arr[0], values=(row[1], row[9]))
+
+        self.fechar_projeto()
 
     def alterar_projeto(self):
         print(self.entNomor.get())
@@ -834,15 +878,32 @@ class RelatoriosDb(object):
     def __init__(self, db):
         self.db = db
 
-    def inserir_um_registro(self, nome):
+    def incluir_relatorio(self, nome):
         try:
             self.db.cursor.execute("""
-            INSERT INTO projetos (nome, desc, autor, banco, conexao, usuario_db,
-    pass_db VARCHAR(100),
-    criado_em DATE NOT NULL,
-    alterado_em)
-            VALUES ('Regis da Silva', 35, '12345678901', 'regis@email.com', '(11) 9876-5342', 'Sao Paulo', 'SP', '2014-07-30 11:23:00.199000')
-            """)
+            INSERT INTO relatorios (
+                           id,
+                           projeto_id,
+                           nome,
+                           descricao,
+                           sql,
+                           ordem,
+                           operacao,
+                           autor,
+                           criado_em,
+                           alterado_em
+                       )
+                       VALUES (
+                           'id',
+                           'projeto_id',
+                           'desc',
+                           'sql',
+                           'proximo_id',
+                           'operacao',
+                           'autor',
+                           'criado_em',
+                           'alterado_em'
+                       )""")
             # gravando no bd
             self.db.commit_db()
             print("Um registro inserido com sucesso.")
@@ -850,9 +911,9 @@ class RelatoriosDb(object):
             print("Aviso: O email deve ser único.")
             return False
 
-    def listar_relatorios(self):
-        sql = 'SELECT * FROM relatorios ORDER BY nome'
-        r = self.db.cursor.execute(sql)
+    def listar_relatorios(self, projeto_id):
+        sql = 'SELECT * FROM relatorios WHERE projeto_id = ? ORDER BY desc'
+        r = self.db.cursor.execute(sql, (projeto_id,))
         return r.fetchall()
 
     def localizar_projeto(self, id):
