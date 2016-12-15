@@ -73,7 +73,7 @@ class Relat:
 
         self.parent.title("Relat")
         self.parent.geometry("700x450")
-        self.parent.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.parent.protocol("WM_DELETE_WINDOW", self.fechar_janela)
 
         main_frame = Frame(self.parent)
         main_frame.pack(fill=BOTH, expand=YES)
@@ -103,7 +103,7 @@ class Relat:
 
         self.sair_img = tk.PhotoImage(file="./imagens/sair.png")
 
-        self.sair_btn = ttk.Button(toolbar, image=self.sair_img, command=self.on_close)
+        self.sair_btn = ttk.Button(toolbar, image=self.sair_img, command=self.fechar_janela)
         self.sair_btn.pack(side=LEFT, pady=1)
 
         status_bar = Frame(main_frame)
@@ -175,8 +175,6 @@ class Relat:
                                                 command=self.excluir_relatorio)
         self.excluir_relatorio_btn.pack(side=TOP, pady=2)
 
-        ttk.Separator(frame_botoes).pack(side=TOP, padx=10, pady=1)
-
         self.move_up_img = tk.PhotoImage(file="./imagens/up.png")
 
         self.move_up_btn = ttk.Button(frame_botoes, width=20, text="Mover para cima", image=self.move_up_img,
@@ -194,9 +192,9 @@ class Relat:
         projeto_menu = tk.Menu(menu_bar, tearoff=0)
         projeto_menu.add_command(label="Projetos", command=self.lista_projetos)
 
-        projeto_menu.add_command(label="Fechar Projeto", command=self.fechar_projeto)
+        projeto_menu.add_command(label="Fechar Projeto", command=self.fechar_projeto_janela)
         projeto_menu.add_separator()
-        projeto_menu.add_command(label="Sair", command=self.on_close)
+        projeto_menu.add_command(label="Sair", command=self.fechar_janela)
         menu_bar.add_cascade(label="Projetos", menu=projeto_menu)
 
         ajuda_menu = tk.Menu(menu_bar, tearoff=0)
@@ -209,90 +207,23 @@ class Relat:
 
         self.parent.config(menu=menu_bar)
 
-    def on_close(self, event=None):
-        self.parent.destroy()
-
-    def move_up(self):
-        leaves = self.relatorios_grid.selection()
-        print("item: ", leaves)
-        for i in leaves:
-            self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) - 1)
-
-    def move_down(self):
-        leaves = self.relatorios_grid.selection()
-        for i in leaves:
-            self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) + 1)
-
     def lista_projetos(self):
-        app = Projeto(self.parent, self.db)
-        # app.novo_projeto()
 
-    def lista_relatorios(self, relatorios):
-
-        self.relatorios = relatorios
-
-        for row in self.relatorios:
-            self.relatorios_grid.insert("", END, row[0], values=(row[1], row[8]))
-
-    def fechar_projeto(self):
-        app = Projeto(self.parent, self.db)
-        # app.novo_projeto()
-
-    def abrir_projeto(self, event=None):
-        app = Projeto(self.parent, self.db)
-        app.abrir_projeto()
-
-    def iniciar(self):
-        pass
-
-    def cancelar(self):
-        pass
-
-    def novo_relatorio(self):
-        app = Relatorio(self.parent)
-        app.novo_relatorio()
-
-    def alterar_relatorio(self):
-        app = Relatorio(self.parent)
-        app.alterar_relatorio()
-
-    def alterar_relatorio_click(self, event):
-        item = self.relatorios_grid.selection()[0]
-
-        app = Relatorio(self.parent)
-        app.alterar_relatorio()
-
-        print("you clicked on", self.relatorios_grid.item(item, "text"))
-
-    def excluir_relatorio(self):
-        app = Projeto(self.parent)
-        app.excluir_relatorio()
-
-    def sobre(self):
-        app = Sobre(self.parent)
-
-
-class Projeto:
-
-    def __init__(self, master, db):
-        self.master = master
-        self.db = db
-
-        self.projeto_janela = Toplevel(self.master)
+        self.projeto_janela = Toplevel(self.parent)
 
         self.projeto_janela.title("Projetos")
         self.projeto_janela.geometry("400x400")
-        self.projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_projeto)
+        self.projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_projeto_janela)
 
         self.projeto_janela.withdraw()
         self.projeto_janela.grid()
-        self.projeto_janela.transient(self.master)
+        self.projeto_janela.transient(self.parent)
         self.projeto_janela.grab_set()
 
         projeto_frame = Frame(self.projeto_janela)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        fechar_btn = ttk.Button(self.projeto_janela, text="Fechar", width=10, command=self.fechar_projeto)
+        fechar_btn = ttk.Button(self.projeto_janela, text="Fechar", width=10, command=self.fechar_projeto_janela)
         fechar_btn.pack(side=RIGHT, padx=5, pady=5)
 
         self.excluir_btn = ttk.Button(self.projeto_janela, text="Excluir", width=10, command=self.excluir_projeto)
@@ -329,7 +260,7 @@ class Projeto:
         self.projetos_grid.heading('nome', text='Nome', anchor=W)
         self.projetos_grid.column('nome', stretch=0, width=200)
         self.projetos_grid.heading('ultima_atualizacao', text='Última Atualização', anchor=W)
-        #self.projetos_grid.column('ultima_atualizacao', stretch=0, width=100)
+        # self.projetos_grid.column('ultima_atualizacao', stretch=0, width=100)
 
         self.projetos_grid.pack(fill=BOTH, side=LEFT, expand=True)
 
@@ -340,29 +271,29 @@ class Projeto:
         centro_(self.projeto_janela)
 
         self.projeto_janela.deiconify()
-        self.master.wait_window(self.projeto_janela)
+        self.parent.wait_window(self.projeto_janela)
 
-    def novo_projeto_janela(self):
+    def novo_projeto(self):
 
-        self.novo_janela = Toplevel()
-        self.novo_janela.resizable(0, 0)
+        self.novo_projeto_janela = Toplevel(self.parent)
+        self.novo_projeto_janela.resizable(0, 0)
 
-        self.novo_janela.title("Novo Projeto")
-        #self.novo_janela.geometry("700x400")
-        self.novo_janela.protocol("WM_DELETE_WINDOW", self.fechar_novo)
+        self.novo_projeto_janela.title("Novo Projeto")
+        self.novo_projeto_janela.geometry("700x400")
+        self.novo_projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_novo_projeto)
 
-        self.novo_janela.withdraw()
-        self.novo_janela.grid()
-        self.novo_janela.transient(self.master)
-        self.novo_janela.grab_set()
+        self.novo_projeto_janela.withdraw()
+        self.novo_projeto_janela.grid()
+        self.novo_projeto_janela.transient(self.parent)
+        self.novo_projeto_janela.grab_set()
 
-        projeto_frame = Frame(self.novo_janela)
+        projeto_frame = Frame(self.novo_projeto_janela)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.novo_janela, text="Cancelar", width=10, command=self.fechar_novo)
+        cancelar_btn = ttk.Button(self.novo_projeto_janela, text="Cancelar", width=10, command=self.fechar_novo_projeto)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.novo_janela, text="Abrir", width=10, command=self.incluir_projeto)
+        ok_btn = ttk.Button(self.novo_projeto_janela, text="Salvar", width=10, command=self.incluir_projeto)
         ok_btn.pack(side=RIGHT)
 
         info_frame = Frame(projeto_frame, bd=10)
@@ -413,31 +344,32 @@ class Projeto:
         self.senha = ttk.Entry(group_db, show="*", width=25)
         self.senha.grid(row=5, column=1, sticky=W, pady=2)
 
-        centro_(self.novo_janela)
+        centro_(self.novo_projeto_janela)
 
-        self.novo_janela.deiconify()
-        self.master.wait_window(self.novo_janela)
+        self.novo_projeto_janela.deiconify()
+        self.parent.wait_window(self.novo_projeto_janela)
 
     def alterar_projeto(self):
-        self.alterar_janela = Toplevel()
-        self.alterar_janela.resizable(0, 0)
 
-        self.alterar_janela.title("Novo Projeto")
-        self.alterar_janela.geometry("700x500")
-        self.alterar_janela.protocol("WM_DELETE_WINDOW", self.fechar)
+        self.alterar_projeto_janela = Toplevel(self.parent)
+        self.alterar_projeto_janela.resizable(0, 0)
 
-        self.alterar_janela.withdraw()
-        self.alterar_janela.grid()
-        self.alterar_janela.transient(self.master)
-        self.alterar_janela.grab_set()
+        self.alterar_projeto_janela.title("Novo Projeto")
+        self.alterar_projeto_janela.geometry("700x500")
+        self.alterar_projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_alterar_projeto)
 
-        projeto_frame = Frame(self.alterar_janela, relief=RAISED, borderwidth=1)
+        self.alterar_projeto_janela.withdraw()
+        self.alterar_projeto_janela.grid()
+        self.alterar_projeto_janela.transient(self.parent)
+        self.alterar_projeto_janela.grab_set()
+
+        projeto_frame = Frame(self.alterar_projeto_janela, relief=RAISED, borderwidth=1)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.alterar_janela, text="Cancelar", width=10, command=self.fechar)
+        cancelar_btn = ttk.Button(self.alterar_projeto_janela, text="Cancelar", width=10, command=self.fechar_alterar_projeto)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.alterar_janela, text="Abrir", width=10, command=self.salvar_projeto)
+        ok_btn = ttk.Button(self.alterar_projeto_janela, text="Abrir", width=10, command=self.salvar_projeto)
         ok_btn.pack(side=RIGHT)
 
         info_frame = Frame(projeto_frame, bd=10)
@@ -488,10 +420,80 @@ class Projeto:
         self.usuario = ttk.Entry(group_db, show="*", width=25)
         self.usuario.grid(row=5, column=1, sticky=W, pady=2)
 
-        centro_(self.alterar_janela)
+        centro_(self.alterar_projeto_janela)
 
-        self.alterar_janela.deiconify()
-        self.master.wait_window(self.projeto_janela)
+        self.alterar_projeto_janela.deiconify()
+        self.parent.wait_window(self.projeto_janela)
+
+    def lista_relatorios(self, relatorios):
+
+        self.relatorios = relatorios
+
+        for row in self.relatorios:
+            self.relatorios_grid.insert("", END, row[0], values=(row[2], row[8]))
+
+    def excluir_projeto(self):
+        if deleteBox("Excluir", "Deseja realmente excluir o projeto selecionado?"):
+            item = self.projetos_grid.selection()[0]
+            self.projetos_grid.delete(item)
+
+            ProjetosDb(self.db).excluirProjeto(item)
+
+            print("Projeto excluído: ", item)
+
+    def salvar_projeto(self):
+        self.projeto_janela.destroy()
+
+    def fechar_janela(self):
+        self.parent.destroy()
+
+    def fechar_projeto_janela(self):
+        self.projeto_janela.destroy()
+
+    def fechar_novo_projeto(self):
+        self.novo_projeto_janela.destroy()
+
+    def fechar_alterar_projeto(self):
+        self.alterar_projeto_janela.destroy()
+
+    def iniciar(self):
+        pass
+
+    def cancelar(self):
+        pass
+
+    def novo_relatorio(self):
+        app = Relatorio(self.parent, self.db)
+        app.novo_relatorio()
+
+    def alterar_relatorio(self):
+        app = Relatorio(self.parent)
+        app.alterar_relatorio()
+
+    def alterar_relatorio_click(self, event):
+        item = self.relatorios_grid.selection()[0]
+
+        app = Relatorio(self.parent)
+        app.alterar_relatorio()
+
+        print("you clicked on", self.relatorios_grid.item(item, "text"))
+
+    def excluir_relatorio(self):
+        print("Relatório excluído")
+
+    def move_up(self):
+        leaves = self.relatorios_grid.selection()
+        print("item: ", leaves)
+        for i in leaves:
+            self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) - 1)
+
+    def move_down(self):
+        leaves = self.relatorios_grid.selection()
+        for i in leaves:
+            self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) + 1)
+
+    def sobre(self):
+        app = Sobre(self.parent)
 
     def abrir_projeto(self, event):
 
@@ -500,9 +502,9 @@ class Projeto:
         relatorios_lista = RelatoriosDb(self.db).listar_relatorios(projeto_id)
         print(relatorios_lista)
 
-        Relat(self, self.db).lista_relatorios(relatorios_lista)
+        self.lista_relatorios(relatorios_lista)
 
-        self.fechar_projeto()
+        self.fechar_projeto_janela()
 
     def habilita_btn(self, event):
         self.excluir_btn.state(["!disabled"])
@@ -524,27 +526,6 @@ class Projeto:
             self.projetos_grid.insert('', END, arr[0], values=(row[1], row[9]))
 
         self.fechar_projeto()
-
-    def salvar_projeto(self):
-        self.projeto_janela.destroy()
-
-    def fechar_projeto(self):
-        self.projeto_janela.destroy()
-
-    def fechar_novo(self):
-        self.novo_janela.destroy()
-
-    def fechar_alterar(self):
-        self.alterar_janela.destroy()
-
-    def excluir_projeto(self):
-        if deleteBox("Excluir", "Deseja realmente excluir o projeto selecionado?"):
-            item = self.projetos_grid.selection()[0]
-            self.projetos_grid.delete(item)
-
-            ProjetosDb(self.db).excluirProjeto(item)
-
-            print("Projeto excluído: ", item)
 
 
 class Relatorio:
