@@ -67,13 +67,14 @@ def centro_(win):
 
 class Relat:
 
+    #Janela prncipal
     def __init__(self, parent, db):
         self.parent = parent
         self.db = db
 
         self.parent.title("Relat")
         self.parent.geometry("700x450")
-        self.parent.protocol("WM_DELETE_WINDOW", self.fechar_janela)
+        self.parent.protocol("WM_DELETE_WINDOW", self.fechar_janela_ctrl)
 
         main_frame = Frame(self.parent)
         main_frame.pack(fill=BOTH, expand=YES)
@@ -84,18 +85,18 @@ class Relat:
 
         self.projeto_img = tk.PhotoImage(file="./imagens/projetos.png")
 
-        projeto_btn = ttk.Button(toolbar, image=self.projeto_img, command=self.lista_projetos)
-        projeto_btn.pack(side=LEFT, padx=2, pady=2)
+        self.lista_projetos_btn = ttk.Button(toolbar, image=self.projeto_img, command=self.lista_projetos)
+        self.lista_projetos_btn.pack(side=LEFT, padx=2, pady=2)
 
         self.iniciar_img = tk.PhotoImage(file="./imagens/iniciar.png")
 
-        self.iniciar_btn = ttk.Button(toolbar, image=self.iniciar_img, command=self.iniciar)
+        self.iniciar_btn = ttk.Button(toolbar, image=self.iniciar_img, command=self.iniciar_ctrl)
         self.iniciar_btn.state(['disabled'])  # set the disabled flag, disabling the button
         self.iniciar_btn.pack(side=LEFT, pady=1)
 
         self.cancelar_img = tk.PhotoImage(file="./imagens/stop.png")
 
-        self.cancelar_btn = ttk.Button(toolbar, image=self.cancelar_img, command=self.cancelar)
+        self.cancelar_btn = ttk.Button(toolbar, image=self.cancelar_img, command=self.cancelar_ctrl)
         self.cancelar_btn.state(['disabled'])  # set the disabled flag, disabling the button
         # self.cancelar_btn.state(['!disabled'])
 
@@ -103,7 +104,7 @@ class Relat:
 
         self.sair_img = tk.PhotoImage(file="./imagens/sair.png")
 
-        self.sair_btn = ttk.Button(toolbar, image=self.sair_img, command=self.fechar_janela)
+        self.sair_btn = ttk.Button(toolbar, image=self.sair_img, command=self.fechar_janela_ctrl)
         self.sair_btn.pack(side=LEFT, pady=1)
 
         status_bar = Frame(main_frame)
@@ -123,7 +124,7 @@ class Relat:
         self.dataCols = ('nome', 'ultima_atualizacao')
         self.relatorios_grid = ttk.Treeview(grid_frame, selectmode='browse', columns=self.dataCols)
         self.relatorios_grid.bind("<Double-1>", self.alterar_relatorio_click)
-        #self.relatorios_grid.bind("<Button-1>", self.habilita_btn)
+        self.relatorios_grid.bind("<Button-1>", self.habilita_btn_relat)
 
         scroll_y = ttk.Scrollbar(grid_frame, orient=VERTICAL, command=self.relatorios_grid.yview)
         scroll_x = ttk.Scrollbar(grid_frame, orient=HORIZONTAL, command=self.relatorios_grid.xview)
@@ -159,6 +160,7 @@ class Relat:
 
         self.novo_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Incluir", image=self.novo_relatorio_img,
                                              compound=LEFT, command=self.novo_relatorio)
+        self.novo_relatorio_btn.state(['disabled'])
         self.novo_relatorio_btn.pack(side=TOP, pady=2)
 
         self.alterar_relatorio_img = tk.PhotoImage(file="./imagens/alterar.png")
@@ -166,25 +168,29 @@ class Relat:
         self.alterar_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Alterar",
                                                 image=self.alterar_relatorio_img,
                                                 compound=LEFT, command=self.alterar_relatorio)
+        self.alterar_relatorio_btn.state(['disabled'])
         self.alterar_relatorio_btn.pack(side=TOP, pady=2)
 
         self.excluir_relatorio_img = tk.PhotoImage(file="./imagens/excluir.png")
 
         self.excluir_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Excluir",
                                                 image=self.excluir_relatorio_img, compound=LEFT,
-                                                command=self.excluir_relatorio)
+                                                command=self.excluir_relatorio_ctrl)
+        self.excluir_relatorio_btn.state(['disabled'])
         self.excluir_relatorio_btn.pack(side=TOP, pady=2)
 
         self.move_up_img = tk.PhotoImage(file="./imagens/up.png")
 
         self.move_up_btn = ttk.Button(frame_botoes, width=20, text="Mover para cima", image=self.move_up_img,
-                                      compound=LEFT, command=self.move_up)
+                                      compound=LEFT, command=self.move_up_ctrl)
+        self.move_up_btn.state(['disabled'])
         self.move_up_btn.pack(side=TOP, pady=2)
 
         self.move_down_img = tk.PhotoImage(file="./imagens/down.png")
 
         self.move_down_btn = ttk.Button(frame_botoes, width=20, text="Mover para baixo", image=self.move_down_img,
-                                        compound=LEFT, command=self.move_down)
+                                        compound=LEFT, command=self.move_down_ctrl)
+        self.move_down_btn.state(['disabled'])
         self.move_down_btn.pack(side=TOP, pady=2)
 
         menu_bar = tk.Menu(main_frame)
@@ -192,17 +198,17 @@ class Relat:
         projeto_menu = tk.Menu(menu_bar, tearoff=0)
         projeto_menu.add_command(label="Projetos", command=self.lista_projetos)
 
-        projeto_menu.add_command(label="Fechar Projeto", command=self.fechar_projeto_janela)
+        projeto_menu.add_command(label="Fechar Projeto", command=self.fechar_projeto_ctrl)
         projeto_menu.add_separator()
-        projeto_menu.add_command(label="Sair", command=self.fechar_janela)
+        projeto_menu.add_command(label="Sair", command=self.fechar_janela_ctrl)
         menu_bar.add_cascade(label="Projetos", menu=projeto_menu)
 
         ajuda_menu = tk.Menu(menu_bar, tearoff=0)
-        ajuda_menu.add_command(label="Ajuda", command=self.sobre)
+        ajuda_menu.add_command(label="Ajuda", command=self.sobre_ctrl)
 
-        ajuda_menu.add_command(label="Licença", command=self.sobre)
+        ajuda_menu.add_command(label="Licença", command=self.sobre_ctrl)
         ajuda_menu.add_separator()
-        ajuda_menu.add_command(label="Sobre", command=self.sobre)
+        ajuda_menu.add_command(label="Sobre", command=self.sobre_ctrl)
         menu_bar.add_cascade(label="Sobre", menu=ajuda_menu)
 
         self.parent.config(menu=menu_bar)
@@ -213,7 +219,7 @@ class Relat:
 
         self.projeto_janela.title("Projetos")
         self.projeto_janela.geometry("400x400")
-        self.projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_projeto_janela)
+        self.projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_projeto_janela_ctrl)
 
         self.projeto_janela.withdraw()
         self.projeto_janela.grid()
@@ -223,27 +229,31 @@ class Relat:
         projeto_frame = Frame(self.projeto_janela)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        fechar_btn = ttk.Button(self.projeto_janela, text="Fechar", width=10, command=self.fechar_projeto_janela)
-        fechar_btn.pack(side=RIGHT, padx=5, pady=5)
+        fechar_proj_btn = ttk.Button(self.projeto_janela, text="Fechar", width=10, command=self.fechar_projeto_janela_ctrl)
+        fechar_proj_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        self.excluir_btn = ttk.Button(self.projeto_janela, text="Excluir", width=10, command=self.excluir_projeto)
-        self.excluir_btn.pack(side=RIGHT, padx=5, pady=5)
-        self.excluir_btn.state(["disabled"])
+        self.excluir_proj_btn = ttk.Button(self.projeto_janela, text="Excluir", width=10, command=self.excluir_projeto_ctrl)
+        self.excluir_proj_btn.pack(side=RIGHT, padx=5, pady=5)
+        self.excluir_proj_btn.state(["disabled"])
 
-        self.abrir_btn = ttk.Button(self.projeto_janela, text="Abrir", width=10, command=self.abrir_projeto)
-        self.abrir_btn.pack(side=RIGHT)
-        self.abrir_btn.state(["disabled"])
+        self.abrir_proj_btn = ttk.Button(self.projeto_janela, text="Abrir", width=10, command=self.abrir_projeto_ctrl)
+        self.abrir_proj_btn.pack(side=RIGHT)
+        self.abrir_proj_btn.state(["disabled"])
 
-        novo_btn = ttk.Button(self.projeto_janela, text="Novo", width=10, command=self.novo_projeto)
-        novo_btn.pack(side=RIGHT, padx=5, pady=5)
+        self.alterar_proj_btn = ttk.Button(self.projeto_janela, text="Alterar", width=10, command=self.alterar_projeto)
+        self.alterar_proj_btn.pack(side=RIGHT)
+        self.alterar_proj_btn.state(["disabled"])
+
+        novo_proj_btn = ttk.Button(self.projeto_janela, text="Novo", width=10, command=self.novo_projeto)
+        novo_proj_btn.pack(side=RIGHT, padx=5, pady=5)
 
         grid_frame = Frame(projeto_frame, bd=10)
         grid_frame.pack(fill=BOTH, expand=YES, side=LEFT)
 
         self.dataCols = ('nome', 'ultima_atualizacao')
         self.projetos_grid = ttk.Treeview(grid_frame, selectmode='browse', columns=self.dataCols)
-        self.projetos_grid.bind("<Double-1>", self.abrir_projeto)
-        self.projetos_grid.bind("<Button-1>", self.habilita_btn)
+        self.projetos_grid.bind("<Double-1>", self.abrir_projeto_click)
+        self.projetos_grid.bind("<Button-1>", self.habilita_btn_proj)
 
         scroll_y = ttk.Scrollbar(grid_frame, orient=VERTICAL, command=self.projetos_grid.yview)
         scroll_x = ttk.Scrollbar(grid_frame, orient=HORIZONTAL, command=self.projetos_grid.xview)
@@ -280,7 +290,7 @@ class Relat:
 
         self.novo_projeto_janela.title("Novo Projeto")
         self.novo_projeto_janela.geometry("700x400")
-        self.novo_projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_novo_projeto)
+        self.novo_projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_novo_projeto_ctrl)
 
         self.novo_projeto_janela.withdraw()
         self.novo_projeto_janela.grid()
@@ -290,10 +300,10 @@ class Relat:
         projeto_frame = Frame(self.novo_projeto_janela)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.novo_projeto_janela, text="Cancelar", width=10, command=self.fechar_novo_projeto)
+        cancelar_btn = ttk.Button(self.novo_projeto_janela, text="Cancelar", width=10, command=self.fechar_novo_projeto_ctrl)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.novo_projeto_janela, text="Salvar", width=10, command=self.incluir_projeto)
+        ok_btn = ttk.Button(self.novo_projeto_janela, text="Salvar", width=10, command=self.incluir_projeto_ctrl)
         ok_btn.pack(side=RIGHT)
 
         info_frame = Frame(projeto_frame, bd=10)
@@ -356,7 +366,7 @@ class Relat:
 
         self.alterar_projeto_janela.title("Novo Projeto")
         self.alterar_projeto_janela.geometry("700x500")
-        self.alterar_projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_alterar_projeto)
+        self.alterar_projeto_janela.protocol("WM_DELETE_WINDOW", self.fechar_alterar_projeto_ctrl)
 
         self.alterar_projeto_janela.withdraw()
         self.alterar_projeto_janela.grid()
@@ -366,10 +376,10 @@ class Relat:
         projeto_frame = Frame(self.alterar_projeto_janela, relief=RAISED, borderwidth=1)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.alterar_projeto_janela, text="Cancelar", width=10, command=self.fechar_alterar_projeto)
+        cancelar_btn = ttk.Button(self.alterar_projeto_janela, text="Cancelar", width=10, command=self.fechar_alterar_projeto_ctrl)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.alterar_projeto_janela, text="Abrir", width=10, command=self.salvar_projeto)
+        ok_btn = ttk.Button(self.alterar_projeto_janela, text="Salvar", width=10, command=self.salvar_projeto_ctrl)
         ok_btn.pack(side=RIGHT)
 
         info_frame = Frame(projeto_frame, bd=10)
@@ -394,11 +404,11 @@ class Relat:
         group_db.grid(row=1, column=0, sticky='nsew')
 
         ttk.Label(group_db, text='Tipo', width=10).grid(row=0, column=0, sticky=W)
-        self.box_value = tk.StringVar()
-        self.box = ttk.Combobox(group_db, textvariable=self.box_value, width=22)
-        self.box['values'] = ('', 'Oracle', 'Mysql', 'PostgreSql')
-        self.box.current(0)
-        self.box.grid(row=0, column=1, sticky=W, pady=2)
+        self.bancos_value = tk.StringVar()
+        self.bancos = ttk.Combobox(group_db, textvariable=self.box_value, width=22)
+        self.bancos['values'] = ('', 'Oracle', 'Mysql', 'PostgreSql')
+        self.bancos.current(0)
+        self.bancos.grid(row=0, column=1, sticky=W, pady=2)
 
         ttk.Label(group_db, text='Servidor', width=10).grid(row=1, column=0, sticky=W)
         self.servidor = ttk.Entry(group_db, width=25)
@@ -425,92 +435,7 @@ class Relat:
         self.alterar_projeto_janela.deiconify()
         self.parent.wait_window(self.projeto_janela)
 
-    def lista_relatorios(self, relatorios):
-
-        self.relatorios = relatorios
-
-        for row in self.relatorios:
-            self.relatorios_grid.insert("", END, row[0], values=(row[2], row[8]))
-
-    def excluir_projeto(self):
-        if deleteBox("Excluir", "Deseja realmente excluir o projeto selecionado?"):
-            item = self.projetos_grid.selection()[0]
-            self.projetos_grid.delete(item)
-
-            ProjetosDb(self.db).excluirProjeto(item)
-
-            print("Projeto excluído: ", item)
-
-    def salvar_projeto(self):
-        self.projeto_janela.destroy()
-
-    def fechar_janela(self):
-        self.parent.destroy()
-
-    def fechar_projeto_janela(self):
-        self.projeto_janela.destroy()
-
-    def fechar_novo_projeto(self):
-        self.novo_projeto_janela.destroy()
-
-    def fechar_alterar_projeto(self):
-        self.alterar_projeto_janela.destroy()
-
-    def iniciar(self):
-        pass
-
-    def cancelar(self):
-        pass
-
-    def novo_relatorio(self):
-        app = Relatorio(self.parent, self.db)
-        app.novo_relatorio()
-
-    def alterar_relatorio(self):
-        app = Relatorio(self.parent)
-        app.alterar_relatorio()
-
-    def alterar_relatorio_click(self, event):
-        item = self.relatorios_grid.selection()[0]
-
-        app = Relatorio(self.parent)
-        app.alterar_relatorio()
-
-        print("you clicked on", self.relatorios_grid.item(item, "text"))
-
-    def excluir_relatorio(self):
-        print("Relatório excluído")
-
-    def move_up(self):
-        leaves = self.relatorios_grid.selection()
-        print("item: ", leaves)
-        for i in leaves:
-            self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) - 1)
-
-    def move_down(self):
-        leaves = self.relatorios_grid.selection()
-        for i in leaves:
-            self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) + 1)
-
-    def sobre(self):
-        app = Sobre(self.parent)
-
-    def abrir_projeto(self, event):
-
-        projeto_id = self.projetos_grid.selection()[0]
-
-        relatorios_lista = RelatoriosDb(self.db).listar_relatorios(projeto_id)
-        print(relatorios_lista)
-
-        self.lista_relatorios(relatorios_lista)
-
-        self.fechar_projeto_janela()
-
-    def habilita_btn(self, event):
-        self.excluir_btn.state(["!disabled"])
-        self.abrir_btn.state(["!disabled"])
-
-    def novo_projeto(self):
+    def salvar_projeto_ctrl(self):
 
         arr = []
         arr.append(self.nome.get())
@@ -525,37 +450,126 @@ class Relat:
         if retorno.isnumeric:
             self.projetos_grid.insert('', END, arr[0], values=(row[1], row[9]))
 
-        self.fechar_projeto()
+        self.fechar_projeto_janela_ctrl()
 
+    def excluir_projeto_ctrl(self):
+        if deleteBox("Excluir", "Deseja realmente excluir o projeto selecionado?"):
+            item = self.projetos_grid.selection()[0]
+            self.projetos_grid.delete(item)
 
-class Relatorio:
-    def __init__(self, master, db):
-        self.master = master
-        self.db = db
+            ProjetosDb(self.db).excluirProjeto(item)
+
+            print("Projeto excluído: ", item)
+
+    def fechar_janela_ctrl(self):
+        self.parent.destroy()
+
+    def fechar_projeto_ctrl(self):
+
+        for child in self.relatorios_grid.get_children():
+            print(self.relatorios_grid.item(child)["values"])
+
+        #self.projetos_grid.delete(item)
+
+        self.iniciar_btn.state(["!disabled"])
+        self.cancelar_btn.state(["disabled"])
+        self.novo_relatorio_btn.state(["disabled"])
+        self.alterar_relatorio_btn.state(["disabled"])
+        self.excluir_relatorio_btn.state(["disabled"])
+        self.move_up_btn.state(["disabled"])
+        self.move_down_btn.state(["disabled"])
+
+    def fechar_projeto_janela_ctrl(self):
+        self.projeto_janela.destroy()
+
+    def fechar_novo_projeto_ctrl(self):
+        self.novo_projeto_janela.destroy()
+
+    def fechar_alterar_projeto_ctrl(self):
+        self.alterar_projeto_janela.destroy()
+
+    def iniciar_ctrl(self):
+
+        self.lista_projetos_btn.state(["disabled"])
+        self.sair_btn.state(["disabled"])
+
+        self.novo_relatorio_btn.state(["disabled"])
+        self.alterar_relatorio_btn.state(["disabled"])
+        self.excluir_relatorio_btn.state(["disabled"])
+        self.move_up_btn.state(["disabled"])
+        self.move_down_btn.state(["disabled"])
+
+        self.iniciar_btn.state(["disabled"])
+        self.cancelar_btn.state(["!disabled"])
+
+    def cancelar_ctrl(self):
+
+        self.lista_projetos_btn.state(["!disabled"])
+        self.sair_btn.state(["!disabled"])
+
+        self.novo_relatorio_btn.state(["!disabled"])
+
+        self.iniciar_btn.state(["!disabled"])
+        self.cancelar_btn.state(["disabled"])
+
+    def abrir_projeto_ctrl(self):
+
+        projeto_id = self.projetos_grid.selection()[0]
+
+        relatorios_lista = RelatoriosDb(self.db).listar_relatorios(projeto_id)
+        #print(relatorios_lista)
+
+        self.lista_relatorios_ctrl(relatorios_lista)
+
+        self.fechar_projeto_janela_ctrl()
+
+        self.habilita_btn_abrir_proj()
+
+    def abrir_projeto_click(self, event):
+
+        projeto_id = self.projetos_grid.selection()[0]
+
+        relatorios_lista = RelatoriosDb(self.db).listar_relatorios(projeto_id)
+        #print(relatorios_lista)
+
+        self.lista_relatorios_ctrl(relatorios_lista)
+
+        self.fechar_projeto_janela_ctrl()
+
+        self.habilita_btn_abrir_proj()
+
+    def habilita_btn_proj(self, event):
+        self.alterar_proj_btn.state(["!disabled"])
+        self.abrir_proj_btn.state(["!disabled"])
+        self.excluir_proj_btn.state(["!disabled"])
+
+    def habilita_btn_abrir_proj(self):
+        self.novo_relatorio_btn.state(["!disabled"])
+        self.iniciar_btn.state(["!disabled"])
 
     def novo_relatorio(self):
-        self.relatorio_janela = Toplevel()
-        self.relatorio_janela.resizable(0, 0)
+        self.novo_relatorio_janela = Toplevel()
+        self.novo_relatorio_janela.resizable(0, 0)
 
-        self.relatorio_janela.title("Novo Relatório")
-        self.relatorio_janela.geometry("500x300")
-        self.relatorio_janela.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.novo_relatorio_janela.title("Novo Relatório")
+        self.novo_relatorio_janela.geometry("500x300")
+        self.novo_relatorio_janela.protocol("WM_DELETE_WINDOW", self.fechar_novo_relatorio_ctrl)
 
-        self.relatorio_janela.withdraw()
-        self.relatorio_janela.grid()
-        self.relatorio_janela.transient(self.master)
-        self.relatorio_janela.grab_set()
+        self.novo_relatorio_janela.withdraw()
+        self.novo_relatorio_janela.grid()
+        self.novo_relatorio_janela.transient(self.parent)
+        self.novo_relatorio_janela.grab_set()
 
-        relatorio_frame = Frame(self.relatorio_janela, relief=RAISED, borderwidth=1)
+        relatorio_frame = Frame(self.novo_relatorio_janela, relief=RAISED, borderwidth=1)
         relatorio_frame.pack(fill=BOTH, expand=True)
 
         self.relatorio_tab = ttk.Notebook(relatorio_frame)
         self.relatorio_tab.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.relatorio_janela, text="Cancelar", width=10, command=self.on_close)
+        cancelar_btn = ttk.Button(self.novo_relatorio_janela, text="Cancelar", width=10, command=self.fechar_novo_relatorio_ctrl)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.relatorio_janela, text="Incluir", width=10, command=self.salvar)
+        ok_btn = ttk.Button(self.novo_relatorio_janela, text="Incluir", width=10, command=self.salvar_relat_ctrl)
         ok_btn.pack(side=RIGHT)
 
         frame_informacaoes = ttk.Frame(self.relatorio_tab)
@@ -601,34 +615,35 @@ class Relatorio:
         self.relatorio_tab.add(f2, text='Consulta')
         self.relatorio_tab.add(f3, text='Configuração')
 
-        centro_(self.relatorio_janela)
+        centro_(self.novo_relatorio_janela)
 
-        self.relatorio_janela.deiconify()
-        self.master.wait_window(self.relatorio_janela)
+        self.novo_relatorio_janela.deiconify()
+        self.parent.wait_window(self.novo_relatorio_janela)
 
     def alterar_relatorio(self):
-        self.relatorio_janela = Toplevel()
-        self.relatorio_janela.resizable(0, 0)
 
-        self.relatorio_janela.title("Alterar Relatório")
-        self.relatorio_janela.geometry("500x300")
-        self.relatorio_janela.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.alterar_relatorio_janela = Toplevel()
+        self.alterar_relatorio_janela.resizable(0, 0)
 
-        self.relatorio_janela.withdraw()
-        self.relatorio_janela.grid()
-        self.relatorio_janela.transient(self.master)
-        self.relatorio_janela.grab_set()
+        self.alterar_relatorio_janela.title("Alterar Relatório")
+        self.alterar_relatorio_janela.geometry("500x300")
+        self.alterar_relatorio_janela.protocol("WM_DELETE_WINDOW", self.fechar_alterar_relatorio_ctrl)
 
-        relatorio_frame = Frame(self.relatorio_janela, relief=RAISED, borderwidth=1)
+        self.alterar_relatorio_janela.withdraw()
+        self.alterar_relatorio_janela.grid()
+        self.alterar_relatorio_janela.transient(self.parent)
+        self.alterar_relatorio_janela.grab_set()
+
+        relatorio_frame = Frame(self.alterar_relatorio_janela, relief=RAISED, borderwidth=1)
         relatorio_frame.pack(fill=BOTH, expand=True)
 
         self.relatorio_tab = ttk.Notebook(relatorio_frame)
         self.relatorio_tab.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.relatorio_janela, text="Cancelar", width=10, command=self.on_close)
+        cancelar_btn = ttk.Button(self.alterar_relatorio_janela, text="Cancelar", width=10, command=self.fechar_alterar_relatorio_ctrl)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.relatorio_janela, text="Incluir", width=10, command=self.salvar)
+        ok_btn = ttk.Button(self.alterar_relatorio_janela, text="Incluir", width=10, command=self.salvar_relat_ctrl)
         ok_btn.pack(side=RIGHT)
 
         f1 = ttk.Frame(self.relatorio_tab)  # first page, which would get widgets gridded into it
@@ -640,16 +655,82 @@ class Relatorio:
         self.relatorio_tab.add(f2, text='Consulta')
         self.relatorio_tab.add(f3, text='Configuração')
 
-        centro_(self.relatorio_janela)
+        centro_(self.alterar_relatorio_janela)
 
-        self.relatorio_janela.deiconify()
-        self.master.wait_window(self.relatorio_janela)
+        self.alterar_relatorio_janela.deiconify()
+        self.parent.wait_window(self.alterar_relatorio_janela)
 
-    def on_close(self):
-        self.relatorio_janela.destroy()
+    def lista_relatorios_ctrl(self, relatorios):
 
-    def salvar(self):
+        self.relatorios = relatorios
+
+        for row in self.relatorios:
+            self.relatorios_grid.insert("", END, row[0], values=(row[2], row[8]))
+
+    def fechar_novo_relatorio_ctrl(self):
+        self.novo_relatorio_janela.destroy()
+
+    def fechar_alterar_relatorio_ctrl(self):
+        self.alterar_relatorio_janela.destroy()
+
+    def salvar_relat_ctrl(self):
         self.projeto_janela.destroy()
+
+    def habilita_btn_relat(self, event):
+        self.alterar_relatorio_btn.state(["!disabled"])
+        self.excluir_relatorio_btn.state(["!disabled"])
+        self.move_up_btn.state(["!disabled"])
+        self.move_down_btn.state(["!disabled"])
+
+    def novo_relatorio_ctrl(self):
+        arr = []
+        arr.append(self.nome.get())
+        arr.append(self.descricao.get())
+        arr.append(self.autor.get())
+        arr.append(self.bancos.get())
+        arr.append(self.nome.get())
+        arr.append(self.usuario.get())
+        arr.append(self.senha.get())
+
+        retorno = ProjetosDb(self.db).incluir_projeto(arr)
+        if retorno.isnumeric:
+            self.projetos_grid.insert('', END, arr[0], values=(row[1], row[9]))
+
+        self.fechar_novo_relatorio_ctrl()
+
+    def alterar_relatorio_ctrl(self):
+        item = self.relatorios_grid.selection()[0]
+
+        print("you clicked on", self.relatorios_grid.item(item, "text"))
+
+    def alterar_relatorio_click(self):
+        item = self.relatorios_grid.selection()[0]
+
+        print("you clicked on", self.relatorios_grid.item(item, "text"))
+
+    def excluir_relatorio_ctrl(self, db):
+
+        if deleteBox("Excluir", "Deseja realmente excluir o relatório selecionado?"):
+            relatorio_id = self.relatorios_grid.selection()
+            self.relatorios_grid.delete(relatorio_id)
+
+            RelatoriosDb(self.db).excluirRelatorio(relatorio_id)
+
+            print("Projeto excluído: ", relatorio_id)
+
+    def move_up_ctrl(self):
+        leaves = self.relatorios_grid.selection()
+        print("item: ", leaves)
+        for i in leaves:
+            self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) - 1)
+
+    def move_down_ctrl(self):
+        leaves = self.relatorios_grid.selection()
+        for i in leaves:
+            self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) + 1)
+
+    def sobre_ctrl(self):
+        app = Sobre(self.parent)
 
 
 class Sobre:
