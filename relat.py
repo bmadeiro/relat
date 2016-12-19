@@ -8,7 +8,6 @@ LARGE_FONT = ("Verdana", 12)
 NORM_FONT = ("Verdana", 10)
 SMALL_FONT = ("Verdana", 8)
 
-
 def msg(msg):
     popup = tk.Tk()
     popup.wm_title("!")
@@ -67,6 +66,9 @@ def centro_(win):
 
 
 class Relat:
+
+    #Guarda o ID do projeto aberto
+    projeto_aberto = 0
 
     #Janela prncipal
     def __init__(self, parent, db):
@@ -485,6 +487,8 @@ class Relat:
 
         projeto_id = self.projetos_grid.selection()[0]
 
+        self.projeto_aberto = projeto_id
+
         relatorios_lista = RelatoriosDb(self.db).listar_relatorios(projeto_id)
         #print(relatorios_lista)
 
@@ -541,6 +545,9 @@ class Relat:
         self.cancelar_btn.state(["disabled"])
 
     def novo_relatorio(self):
+
+        print('Projeto aberto:', self.projeto_aberto)
+
         self.novo_relatorio_janela = Toplevel()
         self.novo_relatorio_janela.resizable(0, 0)
 
