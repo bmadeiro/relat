@@ -471,13 +471,16 @@ class Relat:
 
         #self.projetos_grid.delete(item)
 
-        self.iniciar_btn.state(["!disabled"])
+        self.iniciar_btn.state(["disabled"])
         self.cancelar_btn.state(["disabled"])
         self.novo_relatorio_btn.state(["disabled"])
         self.alterar_relatorio_btn.state(["disabled"])
         self.excluir_relatorio_btn.state(["disabled"])
         self.move_up_btn.state(["disabled"])
         self.move_down_btn.state(["disabled"])
+
+        #Limpar a lista de relatórios
+        self.relatorios_grid.delete(*self.relatorios_grid.get_children())
 
     def fechar_projeto_janela_ctrl(self):
         self.projeto_janela.destroy()
