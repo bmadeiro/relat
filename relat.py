@@ -68,6 +68,9 @@ def centro_(win):
 
 class Relat:
 
+    #Guarda o ID do projeto aberto
+    projeto_aberto = 0
+
     #Janela prncipal
     def __init__(self, parent, db):
         self.parent = parent
@@ -157,7 +160,7 @@ class Relat:
         self.novo_relatorio_img = tk.PhotoImage(file="./imagens/incluir.png")
 
         self.novo_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Incluir", image=self.novo_relatorio_img,
-                                             compound=LEFT, command=self.form_relatorio)
+                                             compound=LEFT, command=self.novo_relatorio)
         self.novo_relatorio_btn.state(['disabled'])
         self.novo_relatorio_btn.pack(side=TOP, pady=2)
 
@@ -483,6 +486,8 @@ class Relat:
 
         projeto_id = self.projetos_grid.selection()[0]
 
+        self.projeto_aberto = projeto_id
+
         relatorios_lista = RelatoriosDb(self.db).listar_relatorios(projeto_id)
         #print(relatorios_lista)
 
@@ -538,7 +543,10 @@ class Relat:
         self.iniciar_btn.state(["!disabled"])
         self.cancelar_btn.state(["disabled"])
 
-    def form_relatorio(self):
+    def novo_relatorio(self):
+
+        print('Projeto aberto:', self.projeto_aberto)
+
         self.novo_relatorio_janela = Toplevel()
         self.novo_relatorio_janela.resizable(0, 0)
 

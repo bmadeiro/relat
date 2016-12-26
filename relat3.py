@@ -933,7 +933,7 @@ class RelatoriosDb(object):
             return False
 
     def listar_relatorios(self, projeto_id):
-        sql = 'SELECT * FROM relatorios WHERE projeto_id = ? ORDER BY desc'
+        sql = 'SELECT * FROM relatorios WHERE projeto_id = ? ORDER BY descricao'
         r = self.db.cursor.execute(sql, (projeto_id,))
         return r.fetchall()
 
