@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 import tkinter as tk
-from tkinter import ttk, messagebox, Frame, Label, Text, TOP, LEFT, BOTH, X, Y, W, EW, NSEW, RIGHT, END, \
+from tkinter import ttk, font,  messagebox, Frame, Label, Text, Listbox, TOP, LEFT, BOTH, X, Y, W, EW, NSEW, RIGHT, END, \
     YES, SUNKEN, BOTTOM, VERTICAL, Toplevel, RAISED, HORIZONTAL
 
 LARGE_FONT = ("Verdana", 12)
@@ -114,9 +114,6 @@ class Relat:
         self.text_status_bar = Label(status_bar, text="www.KlinikPython.Wordpress.Com", relief=SUNKEN, bd=1)
         self.text_status_bar.pack(side=LEFT, fill=X, expand=True)
 
-        self.id_status_bar = Label(status_bar, text="")
-        self.id_status_bar.pack(side=RIGHT)
-
         frame_central = ttk.Notebook(main_frame)
 
         grid_frame = Frame(frame_central, bd=10)
@@ -160,7 +157,7 @@ class Relat:
         self.novo_relatorio_img = tk.PhotoImage(file="./imagens/incluir.png")
 
         self.novo_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Incluir", image=self.novo_relatorio_img,
-                                             compound=LEFT, command=self.novo_relatorio)
+                                             compound=LEFT, command=self.form_relatorio)
         self.novo_relatorio_btn.state(['disabled'])
         self.novo_relatorio_btn.pack(side=TOP, pady=2)
 
@@ -331,7 +328,8 @@ class Relat:
         self.nome.grid(row=0, column=1, sticky=W, pady=2)
 
         ttk.Label(group_info, text='Descrição', width=10).grid(row=1, column=0, sticky=W)
-        self.descricao = Text(group_info, height=4, width=19)
+        self.descricao = Text(group_info, height=4, width=25)
+        self.descricao.configure(font=font.Font(font=self.nome['font']))
         self.descricao.grid(row=1, column=1, sticky=W, pady=2)
 
         ttk.Label(group_info, text='Autor', width=10).grid(row=2, column=0, sticky=W)
@@ -540,7 +538,7 @@ class Relat:
         self.iniciar_btn.state(["!disabled"])
         self.cancelar_btn.state(["disabled"])
 
-    def novo_relatorio(self):
+    def form_relatorio(self):
         self.novo_relatorio_janela = Toplevel()
         self.novo_relatorio_janela.resizable(0, 0)
 
@@ -556,8 +554,8 @@ class Relat:
         relatorio_frame = Frame(self.novo_relatorio_janela, relief=RAISED, borderwidth=1)
         relatorio_frame.pack(fill=BOTH, expand=True)
 
-        self.relatorio_tab = ttk.Notebook(relatorio_frame)
-        self.relatorio_tab.pack(fill=BOTH, expand=True)
+        relatorio_tab = ttk.Notebook(relatorio_frame)
+        relatorio_tab.pack(fill=BOTH, expand=True)
 
         cancelar_btn = ttk.Button(self.novo_relatorio_janela, text="Cancelar", width=10, command=self.fechar_novo_relatorio_ctrl)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
@@ -565,48 +563,83 @@ class Relat:
         ok_btn = ttk.Button(self.novo_relatorio_janela, text="Incluir", width=10, command=self.salvar_relat_ctrl)
         ok_btn.pack(side=RIGHT)
 
-        frame_informacaoes = ttk.Frame(self.relatorio_tab)
-        frame_informacaoes.pack(side=BOTTOM, expand=YES)
+        info_frame = Frame(relatorio_tab, bd=10)
+        info_frame.pack(fill=BOTH, expand=YES, side=RIGHT)
 
-        informacoes_bas = ttk.LabelFrame(frame_informacaoes)
-        frame_informacaoes.pack(side=BOTTOM, expand=YES)
+        group_info = ttk.LabelFrame(info_frame, text="Informações", padding=(6, 6, 12, 12))
+        group_info.grid(row=0, column=0, sticky='nsew')
 
-        # data Nomor
-        ttk.Label(frame_informacaoes, text='Nomor Urut').grid(
-            row=0, column=0, sticky=W)
-        self.entNomor = ttk.Entry(frame_informacaoes)
-        self.entNomor.grid(row=0, column=1)
+        ttk.Label(group_info, text='Nome', width=10).grid(row=0, column=0, sticky=W)
+        self.nome_relatorio = ttk.Entry(group_info, width=25)
+        self.nome_relatorio.grid(row=0, column=1, sticky=W, pady=2)
 
-        # data Nama
-        ttk.Label(frame_informacaoes, text='Nama Lengkap').grid(
-            row=1, column=0, sticky=W)
-        self.entNama = ttk.Entry(frame_informacaoes)
-        self.entNama.grid(row=1, column=1)
+        ttk.Label(group_info, text='Descrição', width=10).grid(row=1, column=0, sticky=W)
+        self.descricao_relatorio = Text(group_info, height=4, width=25)
+        self.descricao_relatorio.configure(font=font.Font(font=self.nome_relatorio['font']))
+        self.descricao_relatorio.grid(row=1, column=1, sticky=W, pady=2)
 
-        # data Alamat
-        ttk.Label(frame_informacaoes, text='Alamat').grid(
-            row=2, column=0, sticky=W)
-        self.entAlamat = ttk.Entry(frame_informacaoes)
-        self.entAlamat.grid(row=2, column=1)
+        ttk.Label(group_info, text='Autor', width=10).grid(row=2, column=0, sticky=W)
+        self.autor_relatorio = ttk.Entry(group_info, width=25)
+        self.autor_relatorio.grid(row=2, column=1, sticky=W, pady=2)
 
-        # data NoTelp
-        ttk.Label(frame_informacaoes, text='No. Telp').grid(
-            row=3, column=0, sticky=W)
-        self.entTelp = ttk.Entry(frame_informacaoes)
-        self.entTelp.grid(row=3, column=1)
+        consulta_frame = ttk.Frame(relatorio_tab)
 
-        # data Kelas
-        ttk.Label(frame_informacaoes, text='Kelas').grid(
-            row=4, column=0, sticky=W)
-        self.entKelas = ttk.Entry(frame_informacaoes)
-        self.entKelas.grid(row=4, column=1)
+        sql_frame = ttk.LabelFrame(consulta_frame, text="Sql", padding=(6, 6, 12, 12))
+        sql_frame.grid(row=0, column=0, sticky=NSEW)
 
-        f2 = ttk.Frame(self.relatorio_tab)  # second page
-        f3 = ttk.Frame(self.relatorio_tab)  # second page
+        self.query = Text(sql_frame, height=4, width=25)
+        self.query.configure(font=font.Font(font=self.nome_relatorio['font']))
+        self.query.grid(row=0, column=0, sticky=W, pady=2)
 
-        self.relatorio_tab.add(frame_informacaoes, text='Informações')
-        self.relatorio_tab.add(f2, text='Consulta')
-        self.relatorio_tab.add(f3, text='Configuração')
+        colunas_frame = ttk.LabelFrame(consulta_frame, text="Colunas", padding=(6, 6, 12, 12))
+        colunas_frame.grid(row=0, column=0, sticky=NSEW)
+
+        self.dataCols = ('nome', 'complemento')
+        self.colunas_grid = ttk.Treeview(colunas_frame, selectmode='browse', columns=self.dataCols)
+        self.colunas_grid.bind("<Double-1>", self.abrir_projeto_click)
+        self.colunas_grid.bind("<Button-1>", self.habilita_btn_proj)
+
+        scroll_y = ttk.Scrollbar(colunas_frame, orient=VERTICAL, command=self.colunas_grid.yview)
+        scroll_x = ttk.Scrollbar(colunas_frame, orient=HORIZONTAL, command=self.colunas_grid.xview)
+        self.colunas_grid['yscroll'] = scroll_y.set
+        self.colunas_grid['xscroll'] = scroll_x.set
+
+        scroll_y.configure(command=self.colunas_grid.yview)
+        scroll_y.pack(side=RIGHT, fill=Y)
+        scroll_x.configure(command=self.colunas_grid.xview)
+        scroll_x.pack(side=BOTTOM, fill=X)
+
+        # setup column headings
+        self.colunas_grid['show'] = 'headings'
+        self.colunas_grid.heading('nome', text='Nome', anchor=W)
+        self.colunas_grid.column('nome', stretch=0, width=200)
+        self.colunas_grid.heading('complemento', text='Última Atualização', anchor=W)
+
+        self.colunas_grid.pack(fill=BOTH, side=LEFT, expand=True)
+
+        frame_botoes = Frame(relatorio_tab, width=200, padx=20, pady=30)
+        frame_botoes.pack(side=RIGHT, fill=Y)
+
+        self.novo_relatorio_img = tk.PhotoImage(file="./imagens/incluir.png")
+
+        self.novo_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Incluir", image=self.novo_relatorio_img,
+                                             compound=LEFT, command=self.form_relatorio)
+        self.novo_relatorio_btn.state(['disabled'])
+        self.novo_relatorio_btn.pack(side=TOP, pady=2)
+
+        self.alterar_relatorio_img = tk.PhotoImage(file="./imagens/alterar.png")
+
+        self.alterar_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Alterar",
+                                                image=self.alterar_relatorio_img,
+                                                compound=LEFT, command=self.alterar_relatorio)
+        self.alterar_relatorio_btn.state(['disabled'])
+        self.alterar_relatorio_btn.pack(side=TOP, pady=2)
+
+        f3 = ttk.Frame(relatorio_tab)  # second page
+
+        relatorio_tab.add(info_frame, text='Informações')
+        relatorio_tab.add(consulta_frame, text='Consulta')
+        relatorio_tab.add(f3, text='Configuração')
 
         centro_(self.novo_relatorio_janela)
 
