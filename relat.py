@@ -125,7 +125,7 @@ class Relat:
         self.dataCols = ('nome', 'ultima_atualizacao')
         self.relatorios_grid = ttk.Treeview(grid_frame, selectmode='browse', columns=self.dataCols)
         self.relatorios_grid.bind("<Double-1>", self.alterar_relatorio_click)
-        self.relatorios_grid.bind("<Button-1>", self.habilita_btn_relat)
+        #self.relatorios_grid.bind("<Button-1>", self.habilita_btn_relat)
 
         scroll_y = ttk.Scrollbar(grid_frame, orient=VERTICAL, command=self.relatorios_grid.yview)
         scroll_x = ttk.Scrollbar(grid_frame, orient=HORIZONTAL, command=self.relatorios_grid.xview)
@@ -160,7 +160,7 @@ class Relat:
         self.novo_relatorio_img = tk.PhotoImage(file="./imagens/incluir.png")
 
         self.novo_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Incluir", image=self.novo_relatorio_img,
-                                             compound=LEFT, command=self.novo_relatorio)
+                                             compound=LEFT, command=lambda: self.form_relatorio('novo'))
         self.novo_relatorio_btn.state(['disabled'])
         self.novo_relatorio_btn.pack(side=TOP, pady=2)
 
@@ -168,7 +168,7 @@ class Relat:
 
         self.alterar_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Alterar",
                                                 image=self.alterar_relatorio_img,
-                                                compound=LEFT, command=self.alterar_relatorio)
+                                                compound=LEFT, command=lambda: self.form_relatorio('alterar'))
         self.alterar_relatorio_btn.state(['disabled'])
         self.alterar_relatorio_btn.pack(side=TOP, pady=2)
 
@@ -241,11 +241,13 @@ class Relat:
         self.abrir_proj_btn.pack(side=RIGHT)
         self.abrir_proj_btn.state(["disabled"])
 
-        self.alterar_proj_btn = ttk.Button(self.projeto_janela, text="Alterar", width=10, command=lambda: self.form_projeto('alterar'))
+        self.alterar_proj_btn = ttk.Button(self.projeto_janela, text="Alterar", width=10,
+                                           command=lambda: self.form_projeto('alterar'))
         self.alterar_proj_btn.pack(side=RIGHT)
         self.alterar_proj_btn.state(["disabled"])
 
-        novo_proj_btn = ttk.Button(self.projeto_janela, text="Novo", width=10, command=lambda: self.form_projeto('novo'))
+        novo_proj_btn = ttk.Button(self.projeto_janela, text="Novo", width=10,
+                                   command=lambda: self.form_projeto('novo'))
         novo_proj_btn.pack(side=RIGHT, padx=5, pady=5)
 
         grid_frame = Frame(projeto_frame, bd=10)
@@ -314,11 +316,13 @@ class Relat:
         projeto_frame = Frame(self.form_projeto_janela)
         projeto_frame.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.form_projeto_janela, text="Cancelar", width=10, command=self.fechar_form_projeto_ctrl)
+        cancelar_btn = ttk.Button(self.form_projeto_janela, text="Cancelar", width=10,
+                                  command=self.fechar_form_projeto_ctrl)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.form_projeto_janela, text="Salvar", width=10, command=lambda: self.form_projeto_ctrl(acao))
-        ok_btn.pack(side=RIGHT)
+        salvar_btn = ttk.Button(self.form_projeto_janela, text="Salvar", width=10,
+                                command=lambda: self.salvar_projeto_ctrl(acao))
+        salvar_btn.pack(side=RIGHT)
 
         info_frame = Frame(projeto_frame, bd=10)
         info_frame.pack(fill=BOTH, expand=YES, side=RIGHT)
@@ -393,7 +397,7 @@ class Relat:
         self.bd_usuario.insert(0, projeto[9])
         self.bd_senha.insert(0, projeto[10])
 
-    def form_projeto_ctrl(self, acao):
+    def salvar_projeto_ctrl(self, acao):
 
         arr = []
         arr.append(self.nome.get())
@@ -543,32 +547,35 @@ class Relat:
         self.iniciar_btn.state(["!disabled"])
         self.cancelar_btn.state(["disabled"])
 
-    def novo_relatorio(self):
+    def form_relatorio(self, acao):
 
         print('Projeto aberto:', self.projeto_aberto)
 
-        self.novo_relatorio_janela = Toplevel()
-        self.novo_relatorio_janela.resizable(0, 0)
+        self.form_relatorio_janela = Toplevel()
+        self.form_relatorio_janela.resizable(0, 0)
 
-        self.novo_relatorio_janela.title("Novo Relatório")
-        self.novo_relatorio_janela.geometry("500x300")
-        self.novo_relatorio_janela.protocol("WM_DELETE_WINDOW", self.fechar_novo_relatorio_ctrl)
+        if acao == 'incluir':
+            self.form_relatorio_janela.title("Novo Relatório")
+        else:
+            self.form_relatorio_janela.title("Alterar Relatório")
+        self.form_relatorio_janela.geometry("500x300")
+        self.form_relatorio_janela.protocol("WM_DELETE_WINDOW", self.fechar_form_relatorio_ctrl)
 
-        self.novo_relatorio_janela.withdraw()
-        self.novo_relatorio_janela.grid()
-        self.novo_relatorio_janela.transient(self.parent)
-        self.novo_relatorio_janela.grab_set()
+        self.form_relatorio_janela.withdraw()
+        self.form_relatorio_janela.grid()
+        self.form_relatorio_janela.transient(self.parent)
+        self.form_relatorio_janela.grab_set()
 
-        relatorio_frame = Frame(self.novo_relatorio_janela, relief=RAISED, borderwidth=1)
+        relatorio_frame = Frame(self.form_relatorio_janela, relief=RAISED, borderwidth=1)
         relatorio_frame.pack(fill=BOTH, expand=True)
 
         relatorio_tab = ttk.Notebook(relatorio_frame)
         relatorio_tab.pack(fill=BOTH, expand=True)
 
-        cancelar_btn = ttk.Button(self.novo_relatorio_janela, text="Cancelar", width=10, command=self.fechar_novo_relatorio_ctrl)
+        cancelar_btn = ttk.Button(self.form_relatorio_janela, text="Cancelar", width=10, command=self.fechar_form_relatorio_ctrl)
         cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
 
-        ok_btn = ttk.Button(self.novo_relatorio_janela, text="Incluir", width=10, command=self.salvar_relat_ctrl)
+        ok_btn = ttk.Button(self.form_relatorio_janela, text="Incluir", width=10, command=self.alterar_relatorio_ctrl)
         ok_btn.pack(side=RIGHT)
 
         info_frame = Frame(relatorio_tab, bd=10)
@@ -595,9 +602,9 @@ class Relat:
         sql_frame = ttk.LabelFrame(consulta_frame, text="Sql", padding=(6, 6, 12, 12))
         sql_frame.grid(row=0, column=0, sticky=NSEW)
 
-        self.query = Text(sql_frame, height=4, width=25)
-        self.query.configure(font=font.Font(font=self.nome_relatorio['font']))
-        self.query.grid(row=0, column=0, sticky=W, pady=2)
+        self.consulta = Text(sql_frame, height=4, width=25)
+        self.consulta.configure(font=font.Font(font=self.nome_relatorio['font']))
+        self.consulta.grid(row=0, column=0, sticky=W, pady=2)
 
         colunas_frame = ttk.LabelFrame(consulta_frame, text="Colunas", padding=(6, 6, 12, 12))
         colunas_frame.grid(row=0, column=0, sticky=NSEW)
@@ -631,7 +638,7 @@ class Relat:
         self.novo_relatorio_img = tk.PhotoImage(file="./imagens/incluir.png")
 
         self.novo_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Incluir", image=self.novo_relatorio_img,
-                                             compound=LEFT, command=self.form_relatorio)
+                                             compound=LEFT, command=lambda: self.form_relatorio('novo'))
         self.novo_relatorio_btn.state(['disabled'])
         self.novo_relatorio_btn.pack(side=TOP, pady=2)
 
@@ -639,7 +646,7 @@ class Relat:
 
         self.alterar_relatorio_btn = ttk.Button(frame_botoes, width=20, text="Alterar",
                                                 image=self.alterar_relatorio_img,
-                                                compound=LEFT, command=self.alterar_relatorio)
+                                                compound=LEFT, command=lambda: self.form_relatorio('alterar'))
         self.alterar_relatorio_btn.state(['disabled'])
         self.alterar_relatorio_btn.pack(side=TOP, pady=2)
 
@@ -649,50 +656,65 @@ class Relat:
         relatorio_tab.add(consulta_frame, text='Consulta')
         relatorio_tab.add(f3, text='Configuração')
 
-        centro_(self.novo_relatorio_janela)
+        centro_(self.form_relatorio_janela)
 
-        self.novo_relatorio_janela.deiconify()
-        self.parent.wait_window(self.novo_relatorio_janela)
+        self.form_relatorio_janela.deiconify()
+        self.parent.wait_window(self.form_relatorio_janela)
 
-    def alterar_relatorio(self):
+    def alterar_relatorio_ctrl(self):
 
-        self.alterar_relatorio_janela = Toplevel()
-        self.alterar_relatorio_janela.resizable(0, 0)
+        relatorio_id = self.relatorios_grid.selection()[0]
 
-        self.alterar_relatorio_janela.title("Alterar Relatório")
-        self.alterar_relatorio_janela.geometry("500x300")
-        self.alterar_relatorio_janela.protocol("WM_DELETE_WINDOW", self.fechar_alterar_relatorio_ctrl)
+        relatorio = RelatoriosDb(self.db).localizar_relatorio(relatorio_id)
 
-        self.alterar_relatorio_janela.withdraw()
-        self.alterar_relatorio_janela.grid()
-        self.alterar_relatorio_janela.transient(self.parent)
-        self.alterar_relatorio_janela.grab_set()
+        self.nome.insert(0, projeto[1])
+        self.descricao.insert(END, projeto[2])
+        self.autor.insert(0, projeto[3])
+        self.bd_tipo.current(projeto[4])
+        self.bd_servidor.insert(0, projeto[5])
+        self.bd_porta.insert(0, projeto[6])
+        self.bd_banco.insert(0, projeto[7])
+        self.bd_usuario.insert(0, projeto[9])
+        self.bd_senha.insert(0, projeto[10])
 
-        relatorio_frame = Frame(self.alterar_relatorio_janela, relief=RAISED, borderwidth=1)
-        relatorio_frame.pack(fill=BOTH, expand=True)
+    def salvar_relatorio_ctrl(self, acao):
 
-        self.relatorio_tab = ttk.Notebook(relatorio_frame)
-        self.relatorio_tab.pack(fill=BOTH, expand=True)
+        arr = []
+        arr.append(self.nome.get())
+        arr.append(self.descricao.get("1.0", END))
+        arr.append(self.autor.get())
+        tipo_operacao = self.tipo_operacao.current()
+        arr.append(bd_tipo)
+        arr.append(self.bd_servidor.get())
+        arr.append(self.bd_porta.get())
+        arr.append(self.bd_banco.get())
+        arr.append(self.bd_usuario.get())
+        arr.append(self.bd_senha.get())
 
-        cancelar_btn = ttk.Button(self.alterar_relatorio_janela, text="Cancelar", width=10, command=self.fechar_alterar_relatorio_ctrl)
-        cancelar_btn.pack(side=RIGHT, padx=5, pady=5)
+        #Novo Relatorio
+        if acao == 'novo':
 
-        ok_btn = ttk.Button(self.alterar_relatorio_janela, text="Incluir", width=10, command=self.salvar_relat_ctrl)
-        ok_btn.pack(side=RIGHT)
+            #data de criação
+            arr.append(datetime.now().isoformat(" "))
 
-        f1 = ttk.Frame(self.relatorio_tab)  # first page, which would get widgets gridded into it
-        f1.pack(side=BOTTOM, expand=YES)
+            retorno = RelatoriosDb(self.db).novo_relatorio(arr)
+            # if retorno.isnumeric:
+            #    self.projetos_grid.insert('', END, arr[0], values=(row[1], row[9]))
 
-        f2 = ttk.Frame(self.relatorio_tab)  # second page
-        f3 = ttk.Frame(self.relatorio_tab)  # second page
-        self.relatorio_tab.add(f1, text='Informações')
-        self.relatorio_tab.add(f2, text='Consulta')
-        self.relatorio_tab.add(f3, text='Configuração')
+            self.fechar_form_relatorio_ctrl()
 
-        centro_(self.alterar_relatorio_janela)
+        #Alterar relatorio
+        else:
+            relatorio_id = self.relatorios_grid.selection()[0]
 
-        self.alterar_relatorio_janela.deiconify()
-        self.parent.wait_window(self.alterar_relatorio_janela)
+            # id do projeto
+            arr.append(relatorio_id)
+
+            retorno = RelatoriosDb(self.db).alterar_relatorio(arr)
+            # if retorno.isnumeric:
+            #    self.projetos_grid.insert('', END, arr[0], values=(row[1], row[9]))
+
+            self.fechar_form_relatorio_ctrl()
 
     def lista_relatorios_ctrl(self, relatorios):
 
@@ -701,14 +723,8 @@ class Relat:
         for row in self.relatorios:
             self.relatorios_grid.insert("", END, row[0], values=(row[2], row[8]))
 
-    def fechar_novo_relatorio_ctrl(self):
-        self.novo_relatorio_janela.destroy()
-
-    def fechar_alterar_relatorio_ctrl(self):
-        self.alterar_relatorio_janela.destroy()
-
-    def salvar_relat_ctrl(self):
-        self.projeto_janela.destroy()
+    def fechar_form_relatorio_ctrl(self):
+        self.form_relatorio_janela.destroy()
 
     def habilita_btn_relat(self, event):
         self.alterar_relatorio_btn.state(["!disabled"])
@@ -716,31 +732,8 @@ class Relat:
         self.move_up_btn.state(["!disabled"])
         self.move_down_btn.state(["!disabled"])
 
-    def novo_relatorio_ctrl(self):
-        arr = []
-        arr.append(self.nome.get())
-        arr.append(self.descricao.get())
-        arr.append(self.autor.get())
-        arr.append(self.bancos.get())
-        arr.append(self.nome.get())
-        arr.append(self.usuario.get())
-        arr.append(self.senha.get())
-
-        retorno = ProjetosDb(self.db).incluir_projeto(arr)
-        if retorno.isnumeric:
-            self.projetos_grid.insert('', END, arr[0], values=(row[1], row[9]))
-
-        self.fechar_novo_relatorio_ctrl()
-
-    def alterar_relatorio_ctrl(self):
-        item = self.relatorios_grid.selection()[0]
-
-        print("you clicked on", self.relatorios_grid.item(item, "text"))
-
-    def alterar_relatorio_click(self):
-        item = self.relatorios_grid.selection()[0]
-
-        print("you clicked on", self.relatorios_grid.item(item, "text"))
+    def alterar_relatorio_click(self, event):
+        self.form_relatorio('alterar')
 
     def excluir_relatorio_ctrl(self, db):
 
@@ -748,14 +741,14 @@ class Relat:
             relatorio_id = self.relatorios_grid.selection()
             self.relatorios_grid.delete(relatorio_id)
 
-            RelatoriosDb(self.db).excluirRelatorio(relatorio_id)
+            RelatoriosDb(self.db).excluir_relatorio(relatorio_id)
 
-            print("Projeto excluído: ", relatorio_id)
+            print("Relatório excluído: ", relatorio_id)
 
     def move_up_ctrl(self):
-        leaves = self.relatorios_grid.selection()
-        print("item: ", leaves)
-        for i in leaves:
+        relatorio = self.relatorios_grid.selection()
+        print("item: ", relatorio)
+        for i in relatorio:
             self.relatorios_grid.move(i, self.relatorios_grid.parent(i), self.relatorios_grid.index(i) - 1)
 
     def move_down_ctrl(self):
@@ -921,19 +914,9 @@ class ProjetosDb(object):
                 print("Registro excluído com sucesso.")
             else:
                 print('Não existe projeto com o código informado.')
-        except e:
-            raise e
-
-        '''
-        def novoRelatorio(self):
-
-            cursor.execute("""
-            INSERT INTO clientes (nome, idade, cpf, email, fone, cidade, uf, criado_em)
-            VALUES (?,?,?,?,?,?,?,?)
-            """, (p_nome, p_idade, p_cpf, p_email, p_fone, p_cidade, p_uf, p_criado_em))
-
-            conn.commit()
-            '''
+        except Exception as e:
+            print(e)
+            self.db.rollback_db()
 
 
 class RelatoriosDb(object):
@@ -942,95 +925,69 @@ class RelatoriosDb(object):
     def __init__(self, db):
         self.db = db
 
-    def incluir_relatorio(self, nome):
+    def novo_relatorio(self, dados):
         try:
             self.db.cursor.execute("""
-            INSERT INTO relatorios (
-                           id,
-                           projeto_id,
-                           nome,
-                           descricao,
-                           sql,
-                           ordem,
-                           operacao,
-                           autor,
-                           criado_em,
-                           alterado_em
-                       )
-                       VALUES (
-                           'id',
-                           'projeto_id',
-                           'desc',
-                           'sql',
-                           'proximo_id',
-                           'operacao',
-                           'autor',
-                           'criado_em',
-                           'alterado_em'
-                       )""")
+            INSERT INTO relatorios (projeto_id, nome, descricao, autor, consulta, ordem, tipo_operacao, criado_em,
+            alterado_em)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (dados[0], dados[1], dados[2], dados[3], dados[4], dados[5], dados[6], dados[7], dados[8],))
             # gravando no bd
             self.db.commit_db()
             print("Um registro inserido com sucesso.")
-        except sqlite3.IntegrityError:
-            print("Aviso: O email deve ser único.")
+        # Catch the exception
+        except Exception as e:
+            print(e)
+            # Roll back any change if something goes wrong
+            self.db.rollback_db()
             return False
 
-    def listar_relatorios(self, projeto_id):
+    def listar_relatorios(self, id):
         sql = 'SELECT * FROM relatorios WHERE projeto_id = ? ORDER BY descricao'
-        r = self.db.cursor.execute(sql, (projeto_id,))
+        r = self.db.cursor.execute(sql, (id,))
         return r.fetchall()
 
-    def localizar_projeto(self, id):
+    def localizar_relatorio(self, id):
         r = self.db.cursor.execute(
-            'SELECT * FROM projetos WHERE id = ?', (id,))
+            'SELECT * FROM relatorios WHERE id = ?', (id,))
         return r.fetchone()
 
-    def atualizarProjeto(self, id):
+    def alterar_relatorio(self, dados):
         try:
-            c = self.localizar_projeto(id)
-            if c:
-                # solicitando os dados ao usuário
-                # se for no python2.x digite entre aspas simples
-                self.novo_fone = input('Fone: ')
-                self.db.cursor.execute("""
-                UPDATE projetos
-                SET fone = ?
-                WHERE id = ?
-                """, (self.novo_fone, id,))
-                # gravando no bd
-                self.db.commit_db()
-                print("Dados atualizados com sucesso.")
-            else:
-                print('Não existe cliente com o id informado.')
-        except e:
-            raise e
+            self.db.cursor.execute("""
+                UPDATE relatorios
+                   SET nome = ?,
+                       descricao = ?,
+                       autor = ?,
+                       consulta = ?,
+                       ordem = ?,
+                       tipo_operacao = ?
+                 WHERE id = ?
+                """, (dados[0], dados[1], dados[2], dados[3], dados[4], dados[5], dados[6], dados[7], dados[8],))
+            # gravando no bd
+            self.db.commit_db()
+            print("Dados atualizados com sucesso.")
+        except Exception as e:
+            print(e)
+            # Roll back any change if something goes wrong
+            self.db.rollback_db()
+            return False
 
-    def excluirProjeto(self, id):
+    def excluir_relatorio(self, id):
         try:
             c = self.localizar_cliente(id)
-            # verificando se existe cliente com o ID passado, caso exista
             if c:
                 self.db.cursor.execute("""
-                DELETE FROM projetos WHERE id = ?
+                DELETE FROM relatorios WHERE id = ?
                 """, (id,))
                 # gravando no bd
                 self.db.commit_db()
-                print("Registro %d excluído com sucesso." % id)
+                print("Registro excluído com sucesso.")
             else:
-                print('Não existe projeto com o código informado.')
-        except e:
-            raise e
-
-        '''
-        def novoRelatorio(self):
-
-            cursor.execute("""
-            INSERT INTO clientes (nome, idade, cpf, email, fone, cidade, uf, criado_em)
-            VALUES (?,?,?,?,?,?,?,?)
-            """, (p_nome, p_idade, p_cpf, p_email, p_fone, p_cidade, p_uf, p_criado_em))
-
-            conn.commit()
-            '''
+                print('Não existe relatório com o código informado.')
+        except Exception as e:
+            print(e)
+            self.db.rollback_db()
 
 
 if __name__ == '__main__':

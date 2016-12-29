@@ -22,9 +22,9 @@ CREATE TABLE IF NOT EXISTS relatorios (
     nome TEXT,
     descricao TEXT,
     autor VARCHAR(100) NOT NULL,
-    query TEXT,
+    consulta TEXT,
     ordem NUMBER,
-    bd_operacao VARCHAR(10),
+    tipo_operacao VARCHAR(10),
     criado_em DATETIME NOT NULL,
     alterado_em DATETIME NOT NULL
                          DEFAULT (datetime('now','localtime'))
